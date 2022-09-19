@@ -1,0 +1,15 @@
+C:\Mis archivos\Quinto semestre\LyA\Semantica\obj\Debug\net6.0\Semantica.csproj.AssemblyReference.cache
+C:\Mis archivos\Quinto semestre\LyA\Semantica\obj\Debug\net6.0\Semantica.GeneratedMSBuildEditorConfig.editorconfig
+C:\Mis archivos\Quinto semestre\LyA\Semantica\obj\Debug\net6.0\Semantica.AssemblyInfoInputs.cache
+C:\Mis archivos\Quinto semestre\LyA\Semantica\obj\Debug\net6.0\Semantica.AssemblyInfo.cs
+C:\Mis archivos\Quinto semestre\LyA\Semantica\obj\Debug\net6.0\Semantica.csproj.CoreCompileInputs.cache
+C:\Mis archivos\Quinto semestre\LyA\Semantica\bin\Debug\net6.0\Semantica.exe
+C:\Mis archivos\Quinto semestre\LyA\Semantica\bin\Debug\net6.0\Semantica.deps.json
+C:\Mis archivos\Quinto semestre\LyA\Semantica\bin\Debug\net6.0\Semantica.runtimeconfig.json
+C:\Mis archivos\Quinto semestre\LyA\Semantica\bin\Debug\net6.0\Semantica.dll
+C:\Mis archivos\Quinto semestre\LyA\Semantica\bin\Debug\net6.0\Semantica.pdb
+C:\Mis archivos\Quinto semestre\LyA\Semantica\obj\Debug\net6.0\Semantica.dll
+C:\Mis archivos\Quinto semestre\LyA\Semantica\obj\Debug\net6.0\refint\Semantica.dll
+C:\Mis archivos\Quinto semestre\LyA\Semantica\obj\Debug\net6.0\Semantica.pdb
+C:\Mis archivos\Quinto semestre\LyA\Semantica\obj\Debug\net6.0\Semantica.genruntimeconfig.cache
+C:\Mis archivos\Quinto semestre\LyA\Semantica\obj\Debug\net6.0\ref\Semantica.dll
