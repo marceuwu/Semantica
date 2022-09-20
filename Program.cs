@@ -9,6 +9,14 @@ namespace Semantica
         {
             try
             {
+                /*Byte x =(Byte)256;//castear y convertir el valor de la nueva variable
+                Console.WriteLine(x);
+                x++;
+                Console.WriteLine(x);
+                ¿cómo saber que es de tipo char?
+                si el valor <256 o <= 255
+                */
+
                 Lenguaje a = new Lenguaje();
 
                 a.Programa();

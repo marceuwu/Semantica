@@ -1,3 +1,4 @@
+//Validar la congruencia 
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -107,6 +108,17 @@ namespace Semantica
                 }
             }
             return 0;
+        }
+        private Variable.TipoDato getTipoVariable(string nombreVariable)
+        {
+            foreach (Variable v in listaVariables)
+            {
+                if (v.getNombre().Equals(nombreVariable))
+                {
+                    return v.getTipo();
+                }
+            }
+            return Variable.TipoDato.Char;
         }
         //Programa  -> Librerias? Variables? Main
         public void Programa()
@@ -254,7 +266,25 @@ namespace Semantica
                 Asignacion();
             }
         }
-
+        private Variable.TipoDato EvaluaNuemro(float resultado)
+        {
+            if(resultado <= 255)
+            {
+                return Variable.TipoDato.Char;
+            }
+            else if(resultado <= 65535)
+            {
+                return Variable.TipoDato.Int;
+            }
+            // como saber que un numero tiene parte flotante /fraccionaria 
+            return Variable.TipoDato.Float;
+        }
+        private bool EvaluaSemantica(string variable, float resultado)
+        {
+            Variable.TipoDato tipoDato = getTipoVariable(variable); 
+            
+            return false;
+        }
         //Asignacion -> identificador = cadena | Expresion;
         private void Asignacion()
         {
