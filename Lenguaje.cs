@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-//Requerimiento 1.- Eliminar las dobles comillas del printf e interpretar las secuencia de escape dentro de la cadena ej. \n salto de linea
-//Requerimiento 2.- Marcar los errores sintacticos cuando la variable no exista linea 
-//Requerimiento 3.- Modificar el valor de la variable en la asignación (método asignación)
-//Requerimiento 4.- Obtener el valor de la variable cuando se requiera, ya se puso en factor pero falta programar el método y programar el método getValor() (para que si queremos imprimir variables se pueda(expresión))
-//Requerimiento 5.- Modificar el valor de la variable en el scanf
-//Cada requerimiento vale 20%
+/*
+    Requerimiento 1.- Actualizar el dominante para variables en la expresion (pq solo lo hicimos con numeros) 
+                    ej: float x; char y; y=x -> no podemos asiganar 4 bytes a 1 byte
+    Requerimiento 2.- Actualizar el dominante para el casteo (si el casteo me dice char, el dominante es char)(casteo en postfijo, al final se castea)        
+                    y el valor de la subexpresion
+    Requerimiento 3.- Funcion de conversion, programar un método de conversion de un valor a un tipo de dato
+                    ej. priavte float Convertir(float valor, string TipoDato) regresa el valor al cual se debe cambiar
+                    Deberan usar el residuo de la division %255, %65535
+*/
 namespace Semantica
 {
     
@@ -17,6 +20,7 @@ namespace Semantica
     {
         List<Variable> listaVariables = new List<Variable>();
         Stack<float> stack = new Stack<float>();
+        Variable.TipoDato dominante;
         public Lenguaje()
         {
 
@@ -268,6 +272,10 @@ namespace Semantica
         }
         private Variable.TipoDato EvaluaNuemro(float resultado)
         {
+            
+            if(resultado % 1 !=0){
+                return Variable.TipoDato.Float;
+            }
             if(resultado <= 255)
             {
                 return Variable.TipoDato.Char;
@@ -300,6 +308,8 @@ namespace Semantica
             match(Tipos.Identificador);
             log.Write(nombre + " = ");
             match(Tipos.Asignacion);
+
+            dominante = Variable.TipoDato.Char;
             Expresion();
             match(";");
 
@@ -307,7 +317,23 @@ namespace Semantica
             
             log.WriteLine(" = " + resultado);
             log.WriteLine();
-            ModificaVariable(nombre, resultado);
+
+            Console.WriteLine(dominante);
+            Console.WriteLine(EvaluaNuemro(resultado));
+
+            if(dominante < EvaluaNuemro(resultado))
+            {
+                dominante = EvaluaNuemro(resultado);
+            }
+
+            if( dominante <= getTipoVariable(nombre))
+            {
+                ModificaVariable(nombre, resultado);
+            }
+            else
+            {
+                throw new Error("Error de semantica, NO podemos asiganar un <" + dominante + "> a un "+getTipoVariable(nombre)+ " en linea: " + linea, log);
+            }
         }
 
         //While -> while(Condicion) bloque de instrucciones | instruccion
@@ -592,6 +618,12 @@ namespace Semantica
             if (getClasificacion() == Tipos.Numero)
             {
                 log.Write(getContenido() + " " );
+                
+                if(dominante > EvaluaNuemro(float.Parse(getContenido())))
+                {
+                    dominante = EvaluaNuemro(float.Parse(getContenido()));
+                }
+                
                 stack.Push(float.Parse(getContenido()));
                 match(Tipos.Numero);
                 
@@ -605,15 +637,48 @@ namespace Semantica
                 }
 
                 log.Write(getContenido() + " " );
+                //Requerimiento 1. condicion parecida a la de arriba 
                 stack.Push(getValorVariable(getContenido()));
 
                 match(Tipos.Identificador);
             }
             else
             {
+                bool huboCasteo = false;
+                Variable.TipoDato casteo = Variable.TipoDato.Char;
                 match("(");
+                if(getClasificacion() == Tipos.TipoDato)
+                {
+                    huboCasteo = true;
+                    switch(getContenido())
+                    {
+                        case  "char":
+                            casteo = Variable.TipoDato.Char;
+                            break;
+                        case  "int":
+                            casteo = Variable.TipoDato.Int;
+                            break;
+                        case  "float":
+                            casteo = Variable.TipoDato.Float;
+                            break;
+                    }
+
+                    match(Tipos.TipoDato);
+                    match(")");
+                    match("(");
+                }
                 Expresion();
                 match(")");
+
+                if(huboCasteo)
+                {
+                    //Requerimiento 2.- Actualizar el dominante en base a la variable.TipoDato
+                    //sacar un elemento del satck
+                    //convierto ese valor al equivalente en casteo 
+                    //ej. si el casteo es char y el pop regresa un 256 
+                    //el valor equivalente al casteo es un 0
+                    //uasar metodo Requerimiento 3
+                }
             }
         }
     }

@@ -3,12 +3,15 @@
 #include <conio.h>
 
 float resultado;
-float area, radio, pi,d
+float area, radio, pi,d;
+char x;
 
 // Este programa calcula el area de un circulo
 void main()
 {
-      printf("\n\n\n\t\tHolaaaaaaaaa");
+    //implementacion del casteo
+    x=(char)(1.5+1);
+    printf("\n\n\n\t\tHolaaaaaaaaa");
     printf("\n\n\tRadio =  ");
     scanf("%d", &radio);
     pi = 3.141592653589793;
