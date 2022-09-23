@@ -1,4 +1,5 @@
-﻿using System;
+﻿//DIAZ GUERRERO MARCELA
+using System;
 using System.IO;
 
 namespace Semantica
