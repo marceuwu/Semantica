@@ -544,9 +544,12 @@ namespace Semantica
             else
             {
                 Expresion();
-                Console.Write(stack.Pop());//imprimimos en la consola
+                float resulatado = stack.Pop();
+                if(evaluacion)
+                {
+                    Console.Write(resulatado);//imprimimos en la consola
+                }
             }
-            
             match(")");
             match(";");
         }
