@@ -12,6 +12,8 @@ using System.Text.RegularExpressions;
     Requerimiento 3.- Funcion de conversion, programar un método de conversion de un valor a un tipo de dato
                     ej. priavte float Convertir(float valor, string TipoDato) regresa el valor al cual se debe cambiar
                     Deberan usar el residuo de la division %255, %65535
+    Requerimiento 4.- Evaluar nuevamente la condición de If, While, Do While, For corespecto al parametro que recibe evaluacion=ejecuta
+    Requerimiento 5.- Levantar una excepción en el scanf cuando la captura no sea un número
 */
 namespace Semantica
 {
@@ -132,7 +134,6 @@ namespace Semantica
             Main();
             this.DisplayVariables();
         }
-
         //Librerias -> #include<identificador(.h)?> Librerias?
         private void Libreria()
         {
@@ -202,6 +203,18 @@ namespace Semantica
                 Lista_identificadores(tipo);
             }
         }
+        
+        //Main      -> void main() Bloque de instrucciones
+        private void Main()
+        {
+            match("void");
+            match("main");
+            match("(");
+            match(")");
+            BloqueInstrucciones(true); 
+            
+        }
+
         //Bloque de instrucciones -> {listaIntrucciones?}
         private void BloqueInstrucciones(bool evaluacion)
         {
@@ -344,7 +357,9 @@ namespace Semantica
         {
             match("while");
             match("(");
-            Condicion();
+            //Requermiento 4
+            //encontrar una relacion entre evaluación y condicion para ejjecutar el bloque de instrucciones
+            bool validarWhile = Condicion();
             match(")");
             if (getContenido() == "{") 
             {
@@ -370,7 +385,8 @@ namespace Semantica
             } 
             match("while");
             match("(");
-            Condicion();
+            //Requerimmiento 4
+            bool validarDo = Condicion();
             match(")");
             match(";");
         }
@@ -380,7 +396,8 @@ namespace Semantica
             match("for");
             match("(");
             Asignacion(evaluacion);
-            Condicion();
+            //Requerimmiento 4
+            bool validarFor = Condicion();
             match(";");
             Incremento(evaluacion);
             match(")");
@@ -411,7 +428,7 @@ namespace Semantica
                 if(evaluacion)
                 {
                 //sacar el valor de la variable, incrementarlo en 1 y luego meterlo en la variable
-                ModificaVariable(variable,getValorVariable(variable)+1);
+                ModificaVariable(variable,getValorVariable(variable) + 1);
                 }
             }
             else
@@ -419,7 +436,7 @@ namespace Semantica
                 match("--");
                 if(evaluacion)
                 {
-                ModificaVariable(variable,getValorVariable(variable)-1);
+                ModificaVariable(variable,getValorVariable(variable) - 1);
                 }
             }
         }
@@ -503,8 +520,10 @@ namespace Semantica
         {
             match("if");
             match("(");
+            //Requerimiento 4
             bool validarIf = Condicion();
             match(")");
+
             if (getContenido() == "{")
             {
                 BloqueInstrucciones(validarIf);  
@@ -563,31 +582,21 @@ namespace Semantica
             match(",");
             match("&");
 
-            //Requerimiento 2.- Si no existe la variable levanta la excepcion
             if (ExisteVariable(getContenido()) == false)
             {
                 throw new Error("Error de sintaxis, la variable no ha sido declarada <" + getContenido() + "> en linea: " + linea, log);
             }
 
-            string sValor =""+ Console.ReadLine(); //Capturamos en pantalla
+            if(evaluacion)
+            {
+                string sValor =""+ Console.ReadLine(); //Capturamos en pantalla
+                //Requerimiento 5.- el redLine debe capturar un nuemero, pero si manda una cadena debemos levantar una excepción
+                ModificaVariable(getContenido(),float.Parse(sValor));
+            }
 
-            //Requerimiento 5.- Modificar el valor de la variable en el scanf
-            ModificaVariable(getContenido(),float.Parse(sValor));
-            
             match(Tipos.Identificador);
             match(")");
             match(";");
-        }
-
-        //Main      -> void main() Bloque de instrucciones
-        private void Main()
-        {
-            match("void");
-            match("main");
-            match("(");
-            match(")");
-            BloqueInstrucciones(true);
-            
         }
 
         //Expresion -> Termino MasTermino
