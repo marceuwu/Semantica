@@ -12,8 +12,10 @@ using System.Text.RegularExpressions;
     Requerimiento 3.- Funcion de conversion, programar un método de conversion de un valor a un tipo de dato
                     ej. priavte float Convertir(float valor, string TipoDato) regresa el valor al cual se debe cambiar
                     Deberan usar el residuo de la division %255, %65535
-    Requerimiento 4.- Evaluar nuevamente la condición de If, While, Do While, For corespecto al parametro que recibe evaluacion=ejecuta
+    Requerimiento 4.- Evaluar nuevamente la condición de If - else(se debe comportar de manera contraria), While, Do While, For corespecto al parametro 
+                que recibe evaluacion=ejecuta
     Requerimiento 5.- Levantar una excepción en el scanf cuando la captura no sea un número
+    Requerimiento 6.- Ejecutar el for 
 */
 namespace Semantica
 {
@@ -337,6 +339,7 @@ namespace Semantica
             if(dominante < EvaluaNuemro(resultado))
             {
                 dominante = EvaluaNuemro(resultado);
+                
             }
 
             if( dominante <= getTipoVariable(nombre))
@@ -397,18 +400,28 @@ namespace Semantica
             match("(");
             Asignacion(evaluacion);
             //Requerimmiento 4
+            //Requerimmiento 6:  a) guardar la direccion la posición del archivo de texto
+            
             bool validarFor = Condicion();
-            match(";");
-            Incremento(evaluacion);
-            match(")");
-            if (getContenido() == "{")
-            {
-                BloqueInstrucciones(evaluacion);  
-            }
-            else
-            {
-                Instruccion(evaluacion);
-            }
+            // b) Metemos un ciclo (while)pero despues de validar el for
+            //while()
+            //{
+
+            
+                match(";");
+                Incremento(evaluacion);
+                match(")");
+                if (getContenido() == "{")
+                {
+                    BloqueInstrucciones(evaluacion);  
+                }
+                else
+                {
+                    Instruccion(evaluacion);
+                }
+            //c) Regresar a la posición de lectura del archivo
+            //d) Sacar otro token
+            //}
         }
 
         //Incremento -> Identificador ++ | --
@@ -535,6 +548,7 @@ namespace Semantica
             if (getContenido() == "else")
             {
                 match("else");
+                //Requerimiento 4 
                 if (getContenido() == "{")
                 {
                     BloqueInstrucciones(validarIf);
@@ -664,6 +678,11 @@ namespace Semantica
                 if(dominante > EvaluaNuemro(float.Parse(getContenido())))
                 {
                     dominante = EvaluaNuemro(float.Parse(getContenido()));
+                }
+
+                if(dominante < getTipoVariable(getContenido()))
+                {
+                    dominante = getTipoVariable(getContenido());
                 }
                 
                 stack.Push(float.Parse(getContenido()));
