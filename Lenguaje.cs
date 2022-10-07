@@ -8,12 +8,18 @@ using System.Text.RegularExpressions;
     Requerimiento 1.- Actualizar el dominante para variables en la expresion (pq solo lo hicimos con numeros) 
                     ej: float x; char y; y=x -> no podemos asiganar 4 bytes a 1 byte
     Requerimiento 2.- Actualizar el dominante para el casteo (si el casteo me dice char, el dominante es char)(casteo en postfijo, al final se castea)        
-                    y el valor de la subexpresion
+                    y el valor de la subexpresion   char x; float area; x=(char)area; ->permitir
     Requerimiento 3.- Funcion de conversion, programar un método de conversion de un valor a un tipo de dato
                     ej. priavte float Convertir(float valor, string TipoDato) regresa el valor al cual se debe cambiar
                     Deberan usar el residuo de la division %255, %65535
+
+                    char ->255
+                    float->256
+
+                    debemos hacer una converion 
+                    y asignar el valor nuevo a la variable
     Requerimiento 4.- Evaluar nuevamente la condición de If - else(se debe comportar de manera contraria), While, Do While, For corespecto al parametro 
-                que recibe evaluacion=ejecuta
+                que recibe evaluacion=ejecuta -> verificar que la condición sea correcta para entrar al ciclo
     Requerimiento 5.- Levantar una excepción en el scanf cuando la captura no sea un número
     Requerimiento 6.- Ejecutar el for 
 */
@@ -34,6 +40,20 @@ namespace Semantica
 
         }
 
+        private float ConvertirDato(float valor, string sTipoDato)
+        {
+ 
+            switch(sTipoDato)
+            {
+                case  "char":
+                    valor = valor%255;
+                    break;
+                case  "int":
+                    valor = valor%65535;
+                    break;
+            }
+            return valor;
+        }
         private string EliminaComillas(string cadena)
         {
 
@@ -311,7 +331,6 @@ namespace Semantica
         //Asignacion -> identificador = cadena | Expresion;
         private void Asignacion(bool evaluacion)
         {
-            //Requerimiento 2.- si no existe la variable(getContenido()) levanta la excepcion 
             if(ExisteVariable(getContenido()) == false)
             {
                 throw new Error("Error de sintaxis, la variable no ha sido declarada <" + getContenido() + "> en linea: " + linea, log);
@@ -399,7 +418,7 @@ namespace Semantica
             match("for");
             match("(");
             Asignacion(evaluacion);
-            //Requerimmiento 4
+            //Requerimmiento 4 verificar que la condición se a verdadera
             //Requerimmiento 6:  a) guardar la direccion la posición del archivo de texto
             
             bool validarFor = Condicion();
@@ -428,7 +447,6 @@ namespace Semantica
         private void Incremento(bool evaluacion)
         {
             string variable = getContenido(); //salvamos el token
-            //Requerimiento 2.- si no existe la variable(getContenido()) levanta la excepcion 
             if (ExisteVariable(variable) == false)
             {
                 throw new Error("Error de sintaxis, la variable no ha sido declarada <" + getContenido() + "> en linea: " + linea, log);
@@ -567,7 +585,6 @@ namespace Semantica
             match("(");
             if(getClasificacion() == Tipos.Cadena)
             {
-                //Requerimiento 1.- Eliminar las comillas de la cadena 
                 if(evaluacion)
                 {
                     Console.Write(EliminaComillas(getContenido()));
@@ -605,6 +622,7 @@ namespace Semantica
             {
                 string sValor =""+ Console.ReadLine(); //Capturamos en pantalla
                 //Requerimiento 5.- el redLine debe capturar un nuemero, pero si manda una cadena debemos levantar una excepción
+                //si el sValor es un numero, modifica el valor, sino no y levantamos una excepción de que no es un número :)
                 ModificaVariable(getContenido(),float.Parse(sValor));
             }
 
@@ -671,47 +689,53 @@ namespace Semantica
         //Factor -> numero | identificador | (Expresion)
         private void Factor()
         {
+            
+
             if (getClasificacion() == Tipos.Numero)
             {
                 log.Write(getContenido() + " " );
                 
-                if(dominante > EvaluaNuemro(float.Parse(getContenido())))
+                if(dominante < EvaluaNuemro(float.Parse(getContenido())))
                 {
                     dominante = EvaluaNuemro(float.Parse(getContenido()));
                 }
 
-                if(dominante < getTipoVariable(getContenido()))
-                {
-                    dominante = getTipoVariable(getContenido());
-                }
-                
                 stack.Push(float.Parse(getContenido()));
                 match(Tipos.Numero);
                 
             }
             else if (getClasificacion() == Tipos.Identificador)
-            {
-                //Requerimiento 2.- si no existe la variable(getContenido()) levanta la excepcion 
+            { 
                 if (ExisteVariable(getContenido()) == false)
                 {
                     throw new Error("Error de sintaxis, la variable no ha sido declarada <" + getContenido() + "> en linea: " + linea, log);
                 }
-
+                if(dominante < getTipoVariable(getContenido()))
+                {
+                    dominante = getTipoVariable(getContenido());
+                }
+                
+                match(Tipos.Identificador);
                 log.Write(getContenido() + " " );
                 //Requerimiento 1. condicion parecida a la de arriba 
                 stack.Push(getValorVariable(getContenido()));
 
-                match(Tipos.Identificador);
+               
             }
             else
             {
                 bool huboCasteo = false;
+                string sTipoDato = "";
+                string sNombreVar = "";
                 Variable.TipoDato casteo = Variable.TipoDato.Char;
+               
                 match("(");
                 if(getClasificacion() == Tipos.TipoDato)
                 {
                     huboCasteo = true;
-                    switch(getContenido())
+                    sTipoDato = getContenido();
+
+                    switch(sTipoDato)
                     {
                         case  "char":
                             casteo = Variable.TipoDato.Char;
@@ -726,14 +750,16 @@ namespace Semantica
 
                     match(Tipos.TipoDato);
                     match(")");
-                    match("(");
                 }
                 Expresion();
-                match(")");
-
+               
                 if(huboCasteo)
                 {
                     //Requerimiento 2.- Actualizar el dominante en base a la variable.TipoDato
+                    dominante = casteo;
+                    float valorCastear = stack.Pop();
+                    stack.Push(ConvertirDato(valorCastear,sTipoDato));
+                    
                     //sacar un elemento del satck
                     //convierto ese valor al equivalente en casteo 
                     //ej. si el casteo es char y el pop regresa un 256 
