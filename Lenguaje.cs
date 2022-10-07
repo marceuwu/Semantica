@@ -18,7 +18,7 @@ using System.Text.RegularExpressions;
 
                     debemos hacer una converion 
                     y asignar el valor nuevo a la variable
-    Requerimiento 4.- Evaluar nuevamente la condición de If - else(se debe comportar de manera contraria), While, Do While, For corespecto al parametro 
+    Requerimiento 4.- Evaluar nuevamente la condición de If - else(se debe comportar de manera contraria), While, Do While, For conrespecto al parametro 
                 que recibe evaluacion=ejecuta -> verificar que la condición sea correcta para entrar al ciclo
     Requerimiento 5.- Levantar una excepción en el scanf cuando la captura no sea un número
     Requerimiento 6.- Ejecutar el for 
@@ -381,7 +381,7 @@ namespace Semantica
             match("(");
             //Requermiento 4
             //encontrar una relacion entre evaluación y condicion para ejjecutar el bloque de instrucciones
-            bool validarWhile = Condicion();
+            evaluacion = Condicion();
             match(")");
             if (getContenido() == "{") 
             {
@@ -415,18 +415,20 @@ namespace Semantica
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
+            int posArchivoInicial; 
+            int posArchivoFinal;
             match("for");
             match("(");
             Asignacion(evaluacion);
             //Requerimmiento 4 verificar que la condición se a verdadera
             //Requerimmiento 6:  a) guardar la direccion la posición del archivo de texto
             
-            bool validarFor = Condicion();
-            // b) Metemos un ciclo (while)pero despues de validar el for
-            //while()
-            //{
-
             
+            posArchivoInicial =(int) archivo.BaseStream.Position;
+            evaluacion = Condicion();
+
+            while(evaluacion)
+            {
                 match(";");
                 Incremento(evaluacion);
                 match(")");
@@ -438,9 +440,14 @@ namespace Semantica
                 {
                     Instruccion(evaluacion);
                 }
-            //c) Regresar a la posición de lectura del archivo
-            //d) Sacar otro token
-            //}
+
+                //posArchivoFinal = (int)archivo.BaseStream.Position;
+                //c) Regresar a la posición de lectura del archivo
+                archivo.BaseStream.Position = posArchivoInicial;
+            
+                //d) Sacar otro token
+                evaluacion = Condicion();
+            }
         }
 
         //Incremento -> Identificador ++ | --
@@ -552,28 +559,29 @@ namespace Semantica
             match("if");
             match("(");
             //Requerimiento 4
-            bool validarIf = Condicion();
+            bool validar = Condicion();
             match(")");
 
             if (getContenido() == "{")
             {
-                BloqueInstrucciones(validarIf);  
+                BloqueInstrucciones(validar);  
             }
             else
             {
-                Instruccion(validarIf);
+                Instruccion(validar);
             }
             if (getContenido() == "else")
             {
                 match("else");
                 //Requerimiento 4 
+                validar = true;
                 if (getContenido() == "{")
                 {
-                    BloqueInstrucciones(validarIf);
+                    BloqueInstrucciones(validar);
                 }
                 else
                 {
-                    Instruccion(validarIf);
+                    Instruccion(validar);
                 }
             }
         }
@@ -623,7 +631,15 @@ namespace Semantica
                 string sValor =""+ Console.ReadLine(); //Capturamos en pantalla
                 //Requerimiento 5.- el redLine debe capturar un nuemero, pero si manda una cadena debemos levantar una excepción
                 //si el sValor es un numero, modifica el valor, sino no y levantamos una excepción de que no es un número :)
-                ModificaVariable(getContenido(),float.Parse(sValor));
+                if(float.TryParse(sValor,out float valor))
+                {
+                    ModificaVariable(getContenido(),float.Parse(sValor));
+                }
+                else
+                {
+                    throw new Error("Error de sintaxis, el valor no es un numero <" + getContenido() + "> en linea: " + linea, log);
+                }
+                
             }
 
             match(Tipos.Identificador);

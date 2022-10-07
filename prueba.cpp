@@ -4,12 +4,16 @@
 #include <conio.h>
 
 float resultado;
-float area, radio, pi,d;
+float area, radio, pi;
+int a, d, altura;
 char x;
+int j;
 // Este programa calcula el area de un circulo
 void main()
 {
     
-    x=(char)400;
-    
+    for(j = 0;1<2;j++)
+    {
+           
+    }
 }
