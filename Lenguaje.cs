@@ -726,7 +726,7 @@ namespace Semantica
             {
                 bool huboCasteo = false;
                 string sTipoDato = "";
-                string sNombreVar = "";
+
                 Variable.TipoDato casteo = Variable.TipoDato.Char;
                
                 match("(");
