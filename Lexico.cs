@@ -296,6 +296,7 @@ namespace Semantica
                 {
                     
                     archivo.Read();
+                    //contCaracteres++;
                     if(c == '\n')
                     {
                         linea++;

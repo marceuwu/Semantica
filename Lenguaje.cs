@@ -428,17 +428,51 @@ namespace Semantica
         {
             //archivo.DiscardBufferedData();
             archivo.BaseStream.Seek(posArchivo,SeekOrigin.Begin);
+            //archivo.BaseStream.Position = posArchivo;
         }
 
+        // Incremento del for donde no se modifica el valor de la variable, solo lo retorna para que en el for sea modificado
+        private float IncrementoFor(bool evaluacion)
+        {
+            string variable = getContenido(); //salvamos el token
+            if (ExisteVariable(variable) == false)
+            {
+                throw new Error("Error de sintaxis, la variable no ha sido declarada <" + getContenido() + "> en linea: " + linea, log);
+            }
+
+            match(Tipos.Identificador);
+            if(getContenido() == "++")
+            {
+                match("++");
+                if(evaluacion)
+                {
+                    //sacar el valor de la variable, incrementarlo en 1 y luego meterlo en la variable
+                    return getValorVariable(variable) + 1;
+                }
+            }
+            else
+            {
+                match("--");
+                if(evaluacion)
+                {
+                    return getValorVariable(variable) - 1;
+                }
+            }
+            return 0;
+        }
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
             int posArchivo; 
             bool validarFor;
+            float valorInc = 0;
+            string variableControl ="";
             match("for");
             posArchivo = getContCaracter();
             match("(");
             Asignacion(evaluacion);
+            //int posicionFor = getContCaracter() - getContenido().Length;
+            //int lineaFor = linea;
             //Requerimmiento 4 verificar que la condición se a verdadera
             //Requerimmiento 6:  a) guardar la direccion la posición del archivo de texto
             do
@@ -449,7 +483,8 @@ namespace Semantica
                     validarFor = false;
                 }
                 match(";");
-                Incremento(validarFor);
+                variableControl = getContenido();
+                valorInc = IncrementoFor(validarFor);
                 match(")");
                 if (getContenido() == "{")
                 {
@@ -462,6 +497,11 @@ namespace Semantica
                 //c) Regresar a la posición de lectura del archivo
                 if (validarFor)
                 {
+                    /*setContCaracter(posicionFor);
+                    linea = lineaFor;
+                    CambiarPosArchivo(posicionFor);
+                    NextToken();*/
+
                     CambiarPosArchivo(posArchivo);
                     for(;;)
                     {
@@ -473,6 +513,7 @@ namespace Semantica
                         }
                     }    
                 }
+                ModificaVariable(variableControl, valorInc);
                 //d) Sacar otro token
             }while(validarFor);
         }

@@ -1,5 +1,5 @@
 Archivo: prueba.cpp
-09/10/2022 01:45:42 p. m.
+09/10/2022 03:27:21 p. m.
 
 j = 0  = 0
 
@@ -15,4 +15,4 @@ altura Int 3
 x Float 0
 y Char 0
 i Int 0
-j Int 2
+j Int 0
