@@ -11,8 +11,8 @@ int j;
 // Este programa calcula el area de un circulo
 void main()
 {
-    
-    for(j = 0;1<2;j++)
+
+    for(j = 0;j<2;j++)
     {
            
     }

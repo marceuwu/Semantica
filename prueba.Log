@@ -1,6 +1,16 @@
 Archivo: prueba.cpp
-07/10/2022 12:30:25 a. m.
+08/10/2022 09:43:21 p. m.
 
 j = 0  = 0
 
-1 2 
+j 2 j 2 j 2 
+Variables: 
+resultado Float 0
+area Float 0
+radio Float 0
+pi Float 0
+a Int 0
+d Int 0
+altura Int 0
+x Char 0
+j Int 2

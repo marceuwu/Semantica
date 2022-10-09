@@ -5,6 +5,7 @@ namespace Semantica
 {
     public class Sintaxis : Lexico
     {
+        private int cont = 0 ;
         public Sintaxis()
         {
             NextToken();
@@ -26,7 +27,6 @@ namespace Semantica
                 throw new Error("Error de sintaxis, se espera un " +espera+" en linea: "+linea, log);
             }
         }
-
         public void match(Tipos espera)
         {
             if (espera == getClasificacion())

@@ -1,6 +1,7 @@
 //DIAZ GUERRERO MARCELA
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -46,7 +47,7 @@ namespace Semantica
             switch(sTipoDato)
             {
                 case  "char":
-                    valor = valor%255;
+                    valor = valor%256;
                     break;
                 case  "int":
                     valor = valor%65535;
@@ -122,6 +123,7 @@ namespace Semantica
                 if (v.getNombre().Equals(nombre))
                 {
                     v.setValor(nuevoValor);
+                    break;
                 }
             }
         }
@@ -412,23 +414,34 @@ namespace Semantica
             match(")");
             match(";");
         }
+        public void CambiarPosArchivo(int posArchivo)
+        {
+            //archivo.DiscardBufferedData();
+            archivo.BaseStream.Seek(posArchivo,SeekOrigin.Begin);
+            //archivo.BaseStream.Position = posArchivo;
+
+        }
+
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
-            int posArchivoInicial; 
-            int posArchivoFinal;
+            int posArchivo; 
+            
             match("for");
+
+            posArchivo = getContCaracter();
+
             match("(");
             Asignacion(evaluacion);
+            
             //Requerimmiento 4 verificar que la condición se a verdadera
             //Requerimmiento 6:  a) guardar la direccion la posición del archivo de texto
             
-            
-            posArchivoInicial =(int) archivo.BaseStream.Position;
-            evaluacion = Condicion();
-
-            while(evaluacion)
+            Console.WriteLine(posArchivo);
+            //posArchivo = (int)archivo.BaseStream.Position;
+            do
             {
+                evaluacion = Condicion();
                 match(";");
                 Incremento(evaluacion);
                 match(")");
@@ -440,14 +453,25 @@ namespace Semantica
                 {
                     Instruccion(evaluacion);
                 }
-
-                //posArchivoFinal = (int)archivo.BaseStream.Position;
                 //c) Regresar a la posición de lectura del archivo
-                archivo.BaseStream.Position = posArchivoInicial;
-            
+                
+                if (evaluacion)
+                {
+                    CambiarPosArchivo(posArchivo);
+                    for(;;)
+                    {
+                        NextToken();
+                        if (getContenido()==";")
+                            {
+                            match(";");
+                            break;
+                            }
+                    }
+                    
+                }
                 //d) Sacar otro token
-                evaluacion = Condicion();
-            }
+                
+            }while(evaluacion);
         }
 
         //Incremento -> Identificador ++ | --
@@ -730,11 +754,12 @@ namespace Semantica
                 {
                     dominante = getTipoVariable(getContenido());
                 }
-                
-                match(Tipos.Identificador);
-                log.Write(getContenido() + " " );
-                //Requerimiento 1. condicion parecida a la de arriba 
                 stack.Push(getValorVariable(getContenido()));
+                log.Write(getContenido() + " " );
+                match(Tipos.Identificador);
+                
+                //Requerimiento 1. condicion parecida a la de arriba 
+                
 
                
             }

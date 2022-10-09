@@ -1,5 +1,6 @@
 //DIAZ GUERRERO MARCELA
 using System.IO;
+using System.Runtime.CompilerServices;
 //Sacar tokens
 namespace Semantica
 {
@@ -57,6 +58,8 @@ namespace Semantica
             
             //WS,EF,EL,L, D, .,	E, +, -, =,	:, ;, &, |,	!, >, <, *,	%, /, ", ?,La, ', #
         };
+        private int contCaracteres = 0;
+        
         public Lexico()
         {
             linea = 1;
@@ -97,6 +100,10 @@ namespace Semantica
             {
                 throw new Error("Error: El archivo " +Path.GetFileName(path2)+ " no existe ", log);
             }
+        }
+        public int getContCaracter()
+        {
+            return contCaracteres;
         }
         public void cerrar()
         {
@@ -270,19 +277,20 @@ namespace Semantica
             return 22;
         }
         //WS,EF,EL,L, D, .,	E, +, -, =,	:, ;, &, |,	!, >, <, *,	%, /, ", ?,La, ', #
-        public void NextToken() 
+        public string NextToken() 
         {
             string buffer = "";           
             char c;      
             int estado = 0;
-
             while(estado >= 0)
             {
                 c = (char)archivo.Peek(); //Funcion de transicion
+                
                 estado = TRAND[estado,columna(c)];
                 clasifica(estado);
                 if (estado >= 0)
                 {
+                    
                     archivo.Read();
                     if(c == '\n')
                     {
@@ -291,10 +299,12 @@ namespace Semantica
                     if (estado >0)
                     {
                         buffer += c;
+                        contCaracteres++;
                     }
                     else
                     {
                         buffer = "";
+                        contCaracteres++;
                     }
                 }
             }
@@ -346,6 +356,8 @@ namespace Semantica
             {
               //  log.WriteLine(getContenido() + " | " + getClasificacion());
             }
+
+            return getContenido();
         }
 
         public bool FinArchivo()
