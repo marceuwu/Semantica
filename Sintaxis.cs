@@ -5,7 +5,6 @@ namespace Semantica
 {
     public class Sintaxis : Lexico
     {
-        private int cont = 0 ;
         public Sintaxis()
         {
             NextToken();

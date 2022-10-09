@@ -2,18 +2,21 @@
 #include <iostream>
 #include <stdio.h>
 #include <conio.h>
-
-float resultado;
-float area, radio, pi;
+float area, radio, pi, resultado;
 int a, d, altura;
-char x;
-int j;
-// Este programa calcula el area de un circulo
-void main()
-{
-
-    for(j = 0;j<2;j++)
-    {
-           
+float x;
+char y;int i ;int j;
+// Este programa calcula el volumen de un cilindro.
+void main(){
+    //Requerimiento 5.- Levanta una excepcion en el scanf si la captura no es un numero
+    printf("Introduce la altura de la piramide: ");
+    scanf("altura", &altura);
+    for(j = 0; j < altura-1; j++){
+        if(j!=2){
+            printf("*");
+        }
+        else{
+            printf("-");//Requerimiento 4.- evalua nuevamente los else
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace Semantica
         const int F = -1;
         const int E = -2;
         protected int linea;
+        protected int contCaracteres = 0;
         int[,] TRAND = new int[,]
         {
             //WS,EF,EL,L, D, .,	E, +, -, =,	:, ;, &, |,	!, >, <, *,	%, /, ", ?,La, ', #
@@ -58,8 +59,7 @@ namespace Semantica
             
             //WS,EF,EL,L, D, .,	E, +, -, =,	:, ;, &, |,	!, >, <, *,	%, /, ", ?,La, ', #
         };
-        private int contCaracteres = 0;
-        
+
         public Lexico()
         {
             linea = 1;
@@ -104,6 +104,10 @@ namespace Semantica
         public int getContCaracter()
         {
             return contCaracteres;
+        }
+        public void setContCaracter(int cont)
+        {
+            contCaracteres = cont;
         }
         public void cerrar()
         {

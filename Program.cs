@@ -42,6 +42,8 @@ namespace Semantica
             {
                 Console.WriteLine(e.Message);
             }
+
+            Console.ReadLine();
         }
     }
 }
