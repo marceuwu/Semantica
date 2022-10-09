@@ -426,12 +426,11 @@ namespace Semantica
         }
         public void CambiarPosArchivo(int posArchivo)
         {
-            //archivo.DiscardBufferedData();
+            archivo.DiscardBufferedData();
             archivo.BaseStream.Seek(posArchivo,SeekOrigin.Begin);
-            //archivo.BaseStream.Position = posArchivo;
         }
 
-        // Incremento del for donde no se modifica el valor de la variable, solo lo retorna para que en el for sea modificado
+        // Incremento del for donde no se modifica el valor de la variable, solo lo retorna para que al final del for sea modificado
         private float IncrementoFor(bool evaluacion)
         {
             string variable = getContenido(); //salvamos el token
@@ -467,16 +466,19 @@ namespace Semantica
             bool validarFor;
             float valorInc = 0;
             string variableControl ="";
+            int lineaActual;
+
             match("for");
-            posArchivo = getContCaracter();
+            //posArchivo = getContCaracter();
             match("(");
             Asignacion(evaluacion);
-            //int posicionFor = getContCaracter() - getContenido().Length;
-            //int lineaFor = linea;
-            //Requerimmiento 4 verificar que la condición se a verdadera
+                        
             //Requerimmiento 6:  a) guardar la direccion la posición del archivo de texto
+            posArchivo = getContCaracter() - getContenido().Length;
+            lineaActual = linea;
             do
             {
+                //Requerimmiento 4 verificar que la condición se a verdadera
                 validarFor = Condicion();
                 if(!evaluacion)
                 {
@@ -494,15 +496,16 @@ namespace Semantica
                 {
                     Instruccion(validarFor);
                 }
-                //c) Regresar a la posición de lectura del archivo
                 if (validarFor)
                 {
-                    /*setContCaracter(posicionFor);
-                    linea = lineaFor;
-                    CambiarPosArchivo(posicionFor);
-                    NextToken();*/
-
+                    setContCaracter(posArchivo);
+                    linea = lineaActual;
+                    //c) Regresar a la posición de lectura del archivo
                     CambiarPosArchivo(posArchivo);
+                    //d) Sacar otro token
+                    NextToken();
+
+                    /*CambiarPosArchivo(posArchivo);
                     for(;;)
                     {
                         NextToken();
@@ -511,10 +514,9 @@ namespace Semantica
                             match(";");
                             break;
                         }
-                    }    
+                    }*/    
                 }
                 ModificaVariable(variableControl, valorInc);
-                //d) Sacar otro token
             }while(validarFor);
         }
 

@@ -296,7 +296,7 @@ namespace Semantica
                 {
                     
                     archivo.Read();
-                    //contCaracteres++;
+                    contCaracteres++;
                     if(c == '\n')
                     {
                         linea++;
@@ -304,12 +304,12 @@ namespace Semantica
                     if (estado >0)
                     {
                         buffer += c;
-                        contCaracteres++;
+                        //contCaracteres++;
                     }
                     else
                     {
                         buffer = "";
-                        contCaracteres++;
+                        //contCaracteres++;
                     }
                 }
             }
