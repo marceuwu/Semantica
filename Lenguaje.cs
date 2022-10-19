@@ -8,23 +8,16 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 /*
-    Requerimiento 1.- Actualizar el dominante para variables en la expresion (pq solo lo hicimos con numeros) 
-                    ej: float x; char y; y=x -> no podemos asiganar 4 bytes a 1 byte
-    Requerimiento 2.- Actualizar el dominante para el casteo (si el casteo me dice char, el dominante es char)(casteo en postfijo, al final se castea)        
-                    y el valor de la subexpresion   char x; float area; x=(char)area; ->permitir
-    Requerimiento 3.- Funcion de conversion, programar un método de conversion de un valor a un tipo de dato
-                    ej. priavte float Convertir(float valor, string TipoDato) regresa el valor al cual se debe cambiar
-                    Deberan usar el residuo de la division %255, %65535
-
-                    char ->255
-                    float->256
-
-                    debemos hacer una converion 
-                    y asignar el valor nuevo a la variable
-    Requerimiento 4.- Evaluar nuevamente la condición de If - else(se debe comportar de manera contraria), While, Do While, For conrespecto al parametro 
-                que recibe evaluacion=ejecuta -> verificar que la condición sea correcta para entrar al ciclo
-    Requerimiento 5.- Levantar una excepción en el scanf cuando la captura no sea un número
-    Requerimiento 6.- Ejecutar el for 
+    Requerimiento 1.- Actulización: 
+                        a) agregar el residuo de la divison en porfactor
+                        b) agregar en Instrucción los incrementos de termino y los increnmentos de factor
+                            a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1,
+                            donde el 1 puede ser una expresion, valida la expresion y hace el incremneto
+                        c) marcar errores semanticos cuando los incrementos de termino o incrementos de factor superen el rango de la variable
+                            y =  255; y++; //error
+                        d) considerar el b) y c) para el for   
+                            j=j+1, j=j-1 
+                        e) Hacer funcionar el do y while
 */
 namespace Semantica
 {
@@ -42,7 +35,11 @@ namespace Semantica
         {
 
         }
-
+        ~Lenguaje()
+        {
+            Console.WriteLine("Destructor de Lenguaje");
+            cerrar();
+        }
         private float ConvertirDato(float valor, string sTipoDato)
         {
  
@@ -348,33 +345,43 @@ namespace Semantica
             match(Tipos.Asignacion);
 
             dominante = Variable.TipoDato.Char;
-            Expresion();
-            match(";");
-
-            float resultado = stack.Pop();
-            
-            log.WriteLine(" = " + resultado);
-            log.WriteLine();
-
-            //Console.WriteLine(dominante);
-            //Console.WriteLine(EvaluaNuemro(resultado));
-
-            if(dominante < EvaluaNuemro(resultado))
+            if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
             {
-                dominante = EvaluaNuemro(resultado);
-                
-            }
-
-            if( dominante <= getTipoVariable(nombre))
-            {
-                if(evaluacion)
-                {
-                    ModificaVariable(nombre, resultado);
-                }
+                //Requerimiento 1.b
+                //poner los match's
+                //Requerimiento 1.c
             }
             else
             {
-                throw new Error("Error de semantica, NO podemos asiganar un <" + dominante + "> a un "+getTipoVariable(nombre)+ " en linea: " + linea, log);
+               
+                Expresion();
+                match(";");
+
+                float resultado = stack.Pop();
+                
+                log.WriteLine(" = " + resultado);
+                log.WriteLine();
+
+                //Console.WriteLine(dominante);
+                //Console.WriteLine(EvaluaNuemro(resultado));
+
+                if(dominante < EvaluaNuemro(resultado))
+                {
+                    dominante = EvaluaNuemro(resultado);
+                    
+                }
+
+                if( dominante <= getTipoVariable(nombre))
+                {
+                    if(evaluacion)
+                    {
+                        ModificaVariable(nombre, resultado);
+                    }
+                }
+                else
+                {
+                    throw new Error("Error de semantica, NO podemos asiganar un <" + dominante + "> a un "+getTipoVariable(nombre)+ " en linea: " + linea, log);
+                }
             }
         }
 
@@ -469,7 +476,6 @@ namespace Semantica
             int lineaActual;
 
             match("for");
-            //posArchivo = getContCaracter();
             match("(");
             Asignacion(evaluacion);
                         
@@ -487,6 +493,7 @@ namespace Semantica
                 match(";");
                 variableControl = getContenido();
                 valorInc = IncrementoFor(validarFor);
+                //Requerimmiento 1.d
                 match(")");
                 if (getContenido() == "{")
                 {
@@ -503,18 +510,7 @@ namespace Semantica
                     //c) Regresar a la posición de lectura del archivo
                     CambiarPosArchivo(posArchivo);
                     //d) Sacar otro token
-                    NextToken();
-
-                    /*CambiarPosArchivo(posArchivo);
-                    for(;;)
-                    {
-                        NextToken();
-                        if (getContenido()==";")
-                        {
-                            match(";");
-                            break;
-                        }
-                    }*/    
+                    NextToken();   
                 }
                 ModificaVariable(variableControl, valorInc);
             }while(validarFor);
@@ -768,6 +764,7 @@ namespace Semantica
                 log.Write(operador + " ");
                 float n1 = stack.Pop();
                 float n2 = stack.Pop();
+                //Requerimiento 1.a
                 switch (operador)
                 {
                     case "*":

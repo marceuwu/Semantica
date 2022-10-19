@@ -8,6 +8,7 @@ namespace Semantica
     {
         protected StreamReader archivo;
         protected StreamWriter log;
+        protected StreamWriter asm;
         const int F = -1;
         const int E = -2;
         protected int linea;
@@ -67,7 +68,8 @@ namespace Semantica
             bool existencia = File.Exists(path);
             log = new StreamWriter("C:\\Mis archivos\\Quinto semestre\\LyA\\Semantica\\prueba.Log"); 
             log.AutoFlush = true;
-           // log.WriteLine("Primer constructor");
+            // log.WriteLine("Primer constructor");
+            asm = new StreamWriter("C:\\Mis archivos\\Quinto semestre\\LyA\\Semantica\\prueba.asm");
             log.WriteLine("Archivo: prueba.cpp");
             log.WriteLine(DateTime.Now);//Requerimiento 1:
             //Investigar como checar si un archivo existe o no existe 
@@ -86,19 +88,28 @@ namespace Semantica
             //log = new streamWriter(nombre.log)
             //Usar el objeto path
             
-            string path2 = Path.ChangeExtension(nombre, ".log");
-            log = new StreamWriter(path2); 
+            string pathLog = Path.ChangeExtension(nombre, ".log");
+            string pathAsm = Path.ChangeExtension(nombre, ".asm");
+            
+            asm = new StreamWriter(pathAsm);
+            asm.AutoFlush = true;
+
+            log = new StreamWriter(pathLog); 
             log.AutoFlush = true;
             //log.WriteLine("Segundo constructor");
             log.WriteLine("Archivo: "+nombre);
-            log.WriteLine(DateTime.Now);
+            log.WriteLine("Fecha: " + DateTime.Now);
+
+            asm.WriteLine(";Archivo: "+nombre);
+            asm.WriteLine(";Fecha: " + DateTime.Now);
+
             if (File.Exists(nombre))
             {
                 archivo = new StreamReader(nombre);
             }
             else
             {
-                throw new Error("Error: El archivo " +Path.GetFileName(path2)+ " no existe ", log);
+                throw new Error("Error: El archivo " +Path.GetFileName(nombre)+ " no existe ", log);
             }
         }
         public int getContCaracter()
@@ -113,6 +124,7 @@ namespace Semantica
         {
             archivo.Close();
             log.Close();
+            asm.Close();
         }       
 
         private void clasifica(int estado)
@@ -304,12 +316,10 @@ namespace Semantica
                     if (estado >0)
                     {
                         buffer += c;
-                        //contCaracteres++;
                     }
                     else
                     {
                         buffer = "";
-                        //contCaracteres++;
                     }
                 }
             }

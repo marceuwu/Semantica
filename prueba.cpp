@@ -1,4 +1,4 @@
-//Marcela Díaz Guerrero
+//Marcela DÃ­az Guerrero
 #include <iostream>
 #include <stdio.h>
 #include <conio.h>
@@ -8,29 +8,30 @@ float x;
 char y;int i ;int j;
 // Este programa calcula el volumen de un cilindro.
 void main(){
+
     //Requerimiento 5.- Levanta una excepcion en el scanf si la captura no es un numero
     printf("Introduce la altura de la piramide: ");
     scanf("altura", &altura);
     //Requerimiento 6.- Ejecutar el for y for anidado
-    for(i = altura; i > 0; i--)
+    for(i = altura; i > 0; i-=2)
     {
-        for(j = 0; j < altura-i; j++){
-            if(j!=2)
-            {
+        j = 0;
+        while(j < altura-i)
+        {
+            if(j%2 == 0){
                 printf("*");
             }
-            else
-            {
+            else{
                 printf("-");//Requerimiento 4.- evalua nuevamente los else
             }
+             j+=1
         }
         printf("\n");
     }
     if(1 != 1){
         printf("Esto no se debe imprimir");
-        if(2 == 2)
-        {
-            printf("Esto tampoco"); //Requerimiento 4.- evalua nuevamente los if respecto al parametro que reciben
+        if(2 == 2){
+            printf("Esto tampoco");     //Requerimiento 4.- evalua nuevamente los if respecto al parametro que reciben
         }
     }
     a = 256;

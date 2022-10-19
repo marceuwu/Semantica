@@ -1,33 +1,6 @@
 Archivo: prueba.cpp
-09/10/2022 04:05:24 p. m.
+19/10/2022 09:45:17 a. m.
 
 i = altura  = 5
 
-i 0 
-j = 0  = 0
-
-j altura i - j 2 i 0 
-j = 0  = 0
-
-j altura i - j 2 j altura i - j 2 i 0 
-j = 0  = 0
-
-j altura i - j 2 j altura i - j 2 j altura i - j 2 i 0 
-j = 0  = 0
-
-j altura i - j 2 j altura i - j 2 j altura i - j 2 j altura i - j 2 i 0 
-j = 0  = 0
-
-j altura i - j 2 j altura i - j 2 j altura i - j 2 j altura i - j 2 j altura i - j 2 i 0 
-j = 0  = 0
-
-j altura i - j 2 1 1 2 2 
-a = 256  = 256
-
-a 
-y = a  = 0
-
-y 
-y = a  = 256
-
-Error de semantica, NO podemos asiganar un <Int> a un Char en linea: 44
+i 0 Error de sintaxis, se espera un -- en linea: 16
