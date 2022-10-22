@@ -72,6 +72,10 @@ namespace Semantica
             asm = new StreamWriter("C:\\Mis archivos\\Quinto semestre\\LyA\\Semantica\\prueba.asm");
             log.WriteLine("Archivo: prueba.cpp");
             log.WriteLine(DateTime.Now);//Requerimiento 1:
+           
+            asm.WriteLine(";Archivo: prueba.cpp");
+            asm.WriteLine(";Fecha: " + DateTime.Now);
+
             //Investigar como checar si un archivo existe o no existe 
             if (existencia == true)
             {

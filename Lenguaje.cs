@@ -13,11 +13,20 @@ using System.Text.RegularExpressions;
                         b) agregar en Instrucción los incrementos de termino y los increnmentos de factor
                             a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1,
                             donde el 1 puede ser una expresion, valida la expresion y hace el incremneto
+                        c) programar el destructor de clase lexico para ejecutar cerrarArchivo
+                            -> ejecutarse sin invocar a close.archivo()
+                            -> #libreria especial con un contenedor
+
+    Requerimiento 2.- Actulización:
                         c) marcar errores semanticos cuando los incrementos de termino o incrementos de factor superen el rango de la variable
                             y =  255; y++; //error
                         d) considerar el b) y c) para el for   
                             j=j+1, j=j-1 
                         e) Hacer funcionar el do y while
+    Requerimiento 3.- Agregar:
+                        a) considerar las variables y los casteos de las expresiones matematicas en ensamblador
+                        b) considerar el residuo de la división en ensamblador, el residuo de la division queda en dx 
+
 */
 namespace Semantica
 {
@@ -102,7 +111,14 @@ namespace Semantica
                 log.WriteLine(v.getNombre()+" "+v.getTipo()+" "+v.getValor());
             }
         }
-
+        private void VariablesASM()
+        {
+            asm.WriteLine(";Variables");
+            foreach (Variable v in listaVariables) // este for no necesita que pongamos que se incremente el contador
+            {
+                asm.WriteLine("\t"+v.getNombre()+" DW ? ");
+            }
+        }
         private bool ExisteVariable(string nombre)
         {
             foreach (Variable v in listaVariables)
@@ -152,10 +168,16 @@ namespace Semantica
         //Programa  -> Librerias? Variables? Main
         public void Programa()
         {
+            asm.WriteLine("#make_COM#");
+            asm.WriteLine("include 'emu8086.inc'");
+            asm.WriteLine("ORG 1000h");
             Libreria();
             Variables();
+            VariablesASM();
             Main();
             this.DisplayVariables();
+            asm.WriteLine("RET");
+            asm.WriteLine("END");
         }
         //Librerias -> #include<identificador(.h)?> Librerias?
         private void Libreria()
@@ -349,7 +371,7 @@ namespace Semantica
             {
                 //Requerimiento 1.b
                 //poner los match's
-                //Requerimiento 1.c
+                //Requerimiento 2.c
             }
             else
             {
@@ -358,7 +380,8 @@ namespace Semantica
                 match(";");
 
                 float resultado = stack.Pop();
-                
+                asm.WriteLine("POP AX");
+
                 log.WriteLine(" = " + resultado);
                 log.WriteLine();
 
@@ -376,6 +399,8 @@ namespace Semantica
                     if(evaluacion)
                     {
                         ModificaVariable(nombre, resultado);
+                        //aqui se hace la modificacion de la variable en ensamblador
+                        asm.WriteLine("MOV " + nombre + ", AX");
                     }
                 }
                 else
@@ -552,6 +577,7 @@ namespace Semantica
             match("(");
             Expresion();
             stack.Pop();
+            asm.WriteLine("POP AX");
             match(")");
             match("{");
             ListaDeCasos(evaluacion);
@@ -577,6 +603,7 @@ namespace Semantica
             match("case");
             Expresion();
             stack.Pop();
+            asm.WriteLine("POP AX");
             match(":");
             ListaInstruccionesCase(evaluacion);
             if(getContenido() == "break")
@@ -599,7 +626,9 @@ namespace Semantica
             Expresion();
 
             float e2 = stack.Pop();
+            asm.WriteLine("POP AX");
             float e1 = stack.Pop();
+            asm.WriteLine("POP BX");
 
             switch (operador)
             {
@@ -676,6 +705,7 @@ namespace Semantica
             {
                 Expresion();
                 float resulatado = stack.Pop();
+                asm.WriteLine("POP AX");
                 if(evaluacion)
                 {
                     Console.Write(resulatado);
@@ -736,13 +766,19 @@ namespace Semantica
                 Termino();
                 log.Write(operador+" ");
                 float n1 = stack.Pop();
+                asm.WriteLine("POP BX");
                 float n2 = stack.Pop();
+                asm.WriteLine("POP AX");
                 switch (operador){
                     case "+":
                         stack.Push(n1+n2);
+                        asm.WriteLine("ADD AX,BX");
+                        asm.WriteLine("PUSH AX");
                         break;
                     case "-":
                         stack.Push(n2-n1);
+                        asm.WriteLine("SUB AX,BX");
+                        asm.WriteLine("PUSH AX");
                         break;
                 }
             }
@@ -763,15 +799,26 @@ namespace Semantica
                 Factor();
                 log.Write(operador + " ");
                 float n1 = stack.Pop();
+                asm.WriteLine("POP BX");
                 float n2 = stack.Pop();
+                asm.WriteLine("POP AX");
                 //Requerimiento 1.a
                 switch (operador)
                 {
                     case "*":
                         stack.Push(n2*n1);
+                        asm.WriteLine("MUL BX");
+                        asm.WriteLine("PUSH AX");
                         break;
                     case "/":
                         stack.Push(n2/n1);
+                        asm.WriteLine("DIV BX");
+                        asm.WriteLine("PUSH AX");
+                        break;
+                    case "%":
+                        stack.Push(n2 % n1);
+                        asm.WriteLine("DIV BX");
+                        asm.WriteLine("PUSH DX");
                         break;
                 }
             }
@@ -788,6 +835,8 @@ namespace Semantica
                 }
 
                 stack.Push(float.Parse(getContenido()));
+                asm.WriteLine("MOV AX,"+getContenido());
+                asm.WriteLine("PUSH AX");
                 match(Tipos.Numero);
                 
             }
@@ -844,6 +893,7 @@ namespace Semantica
                     string nombreVar = getContenido();
                     float valor;
                     float valorCastear = stack.Pop();
+                    asm.WriteLine("POP AX");
                     //sacar un elemento del satck
                     //convierto ese valor al equivalente en casteo 
                     //ej. si el casteo es char y el pop regresa un 256 
