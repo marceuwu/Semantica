@@ -1,15 +1,9 @@
 Archivo: prueba.cpp
-24/10/2022 09:43:06 a. m.
+25/10/2022 09:44:28 a. m.
 
-y = 3 5 + 8 * 10 4 - 2 / -  = 61
+y = 61  = 61
 
-y 61 
-x = 0  = 0
-
-i 5 
-i = 0  = 0
-
-
+60 61 
 x = 10  = 10
 
 
@@ -21,7 +15,7 @@ resultado Float 0
 a Int 0
 d Int 0
 altura Int 0
-x Float 10
+x Float 0
 y Char 61
 i Int 0
 j Int 0

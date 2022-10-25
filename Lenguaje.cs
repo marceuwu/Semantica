@@ -401,13 +401,13 @@ namespace Semantica
                     {
                         ModificaVariable(nombre, resultado);
                         //aqui se hace la modificacion de la variable en ensamblador
-                        asm.WriteLine("MOV " + nombre + ", AX");
                     }
                 }
                 else
                 {
                     throw new Error("Error de semantica, NO podemos asiganar un <" + dominante + "> a un "+getTipoVariable(nombre)+ " en linea: " + linea, log);
                 }
+                asm.WriteLine("MOV " + nombre + ", AX");
             }
         }
 
@@ -417,7 +417,7 @@ namespace Semantica
             match("while");
             match("(");
             //Requermiento 4
-            bool validarWhile = Condicion();
+            bool validarWhile = Condicion("");
             //encontrar una relacion entre evaluación y condicion para ejecutar el bloque de instrucciones
             if (!evaluacion)
             {
@@ -449,7 +449,7 @@ namespace Semantica
             match("while");
             match("(");
             //Requerimmiento 4
-            bool validarDo = Condicion();
+            bool validarDo = Condicion("");
             if (!evaluacion)
             {
                 validarDo = false;
@@ -511,7 +511,7 @@ namespace Semantica
             do
             {
                 //Requerimmiento 4 verificar que la condición se a verdadera
-                validarFor = Condicion();
+                validarFor = Condicion("");
                 if(!evaluacion)
                 {
                     validarFor = false;
@@ -619,7 +619,7 @@ namespace Semantica
         }
 
         //Condicion -> Expresion operador relacional Expresion
-        private bool Condicion()
+        private bool Condicion(string etiqueta)
         {
             Expresion();
             string operador = getContenido();
@@ -630,12 +630,14 @@ namespace Semantica
             asm.WriteLine("POP AX");
             float e1 = stack.Pop();
             asm.WriteLine("POP BX");
-
+            asm.WriteLine("CMP AX,BX");
             switch (operador)
             {
                 case "==":
+                    asm.WriteLine("JNE " + etiqueta);
                     return  e1 == e2;
                 case ">":
+                    asm.WriteLine("JLE " + etiqueta);
                     return  e1 > e2;
                 case "<":
                     return  e1 < e2; 
@@ -644,6 +646,7 @@ namespace Semantica
                 case "<=":
                     return  e1 <= e2;
                 default:
+                    asm.WriteLine("JE " + etiqueta);
                     return e1 != e2;
             }
         }
@@ -655,7 +658,7 @@ namespace Semantica
             match("if");
             match("(");
             //Requerimiento 4
-            bool validarIf = Condicion();
+            bool validarIf = Condicion(etiquetaIf);
             bool validarElse = false;
             if(!evaluacion)
             {
@@ -856,6 +859,7 @@ namespace Semantica
                     dominante = getTipoVariable(getContenido());
                 }
                 stack.Push(getValorVariable(getContenido()));
+                //requerimiento 3
                 match(Tipos.Identificador);
                 
                 //Requerimiento 1. condicion parecida a la de arriba 
