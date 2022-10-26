@@ -26,6 +26,13 @@ using System.Text.RegularExpressions;
     Requerimiento 3.- Agregar:
                         a) considerar las variables y los casteos de las expresiones matematicas en ensamblador
                         b) considerar el residuo de la división en ensamblador, el residuo de la division queda en dx 
+                        c) Programar el printf y el scanf en assembler
+    Requerimiento 4.- Programar 
+                        a) el eslse en assembler
+                        b) Programar el for en assembler
+    Requerimiento 5.- Programar 
+                        a) el while en assembler
+                        b)do while en assembler
 
 */
 namespace Semantica
@@ -37,13 +44,14 @@ namespace Semantica
         Stack<float> stack = new Stack<float>();
         Variable.TipoDato dominante;
         int cIf;
+        int cFor;
         public Lenguaje()
         {
-            cIf = 0;
+            cIf = cFor = 0;
         }
         public Lenguaje(string nombre) : base(nombre)
         {
-            cIf = 0;
+            cIf = cFor = 0;
         }
         ~Lenguaje()
         {
@@ -171,14 +179,13 @@ namespace Semantica
         {
             asm.WriteLine("#make_COM#");
             asm.WriteLine("include 'emu8086.inc'");
-            asm.WriteLine("ORG 1000h");
+            asm.WriteLine("ORG 100h");
             Libreria();
             Variables();
             VariablesASM();
             Main();
             this.DisplayVariables();
             asm.WriteLine("RET");
-            asm.WriteLine("END");
         }
         //Librerias -> #include<identificador(.h)?> Librerias?
         private void Libreria()
@@ -495,12 +502,14 @@ namespace Semantica
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
+            string etiquetaInicioFor = "inicioFor" +cFor;
+            string etiquetaFinFor = "finFor" +cFor++;
             int posArchivo; 
             bool validarFor;
             float valorInc = 0;
             string variableControl ="";
             int lineaActual;
-
+            asm.WriteLine(etiquetaInicioFor + ":");
             match("for");
             match("(");
             Asignacion(evaluacion);
@@ -540,6 +549,7 @@ namespace Semantica
                 }
                 ModificaVariable(variableControl, valorInc);
             }while(validarFor);
+            asm.WriteLine(etiquetaFinFor + ":");
         }
 
         //Incremento -> Identificador ++ | --
@@ -640,10 +650,13 @@ namespace Semantica
                     asm.WriteLine("JLE " + etiqueta);
                     return  e1 > e2;
                 case "<":
+                    asm.WriteLine("JGE " + etiqueta);
                     return  e1 < e2; 
                 case ">=":
+                    asm.WriteLine("JL " + etiqueta);
                     return  e1 >= e2;
                 case "<=":
+                    asm.WriteLine("JG " + etiqueta);
                     return  e1 <= e2;
                 default:
                     asm.WriteLine("JE " + etiqueta);
