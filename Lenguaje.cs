@@ -186,6 +186,7 @@ namespace Semantica
             Main();
             this.DisplayVariables();
             asm.WriteLine("RET");
+            asm.WriteLine("DEFINE_SCAN_NUM");
         }
         //Librerias -> #include<identificador(.h)?> Librerias?
         private void Libreria()
@@ -474,28 +475,105 @@ namespace Semantica
         private float IncrementoFor(bool evaluacion)
         {
             string variable = getContenido(); //salvamos el token
+            float valorExpresion = 0;
             if (ExisteVariable(variable) == false)
             {
                 throw new Error("Error de sintaxis, la variable no ha sido declarada <" + getContenido() + "> en linea: " + linea, log);
             }
 
+            /*b) agregar en Instrucción los incrementos de termino y los increnmentos de factor
+                            a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1,
+                            donde el 1 puede ser una expresion, valida la expresion y hace el incremneto*/
             match(Tipos.Identificador);
-            if(getContenido() == "++")
-            {
-                match("++");
-                if(evaluacion)
-                {
-                    //sacar el valor de la variable, incrementarlo en 1 y luego meterlo en la variable
-                    return getValorVariable(variable) + 1;
-                }
-            }
-            else
-            {
-                match("--");
-                if(evaluacion)
-                {
-                    return getValorVariable(variable) - 1;
-                }
+            switch (getContenido()){
+                case "++":
+                    match("++");
+                    if (evaluacion)
+                    {
+                        /*float valor = getValorVariable(variable);
+                        valor++;
+                        ModificaVariable(variable, valor);
+                        asm.WriteLine("INC " + variable);*/
+                        return getValorVariable(variable) + 1;
+                    }
+                    break;
+                case "--":
+                    match("--");
+                    if (evaluacion)
+                    {
+                        /*float valor = getValorVariable(variable);
+                        valor--;
+                        ModificaVariable(variable, valor);
+                        asm.WriteLine("DEC " + variable);*/
+                        return getValorVariable(variable) - 1;
+                    }
+                    break;
+                case "+=":
+                    match("+=");
+                    Expresion();
+                    valorExpresion = stack.Pop();
+                    if (evaluacion)
+                    {
+                        /*float valor = getValorVariable(variable);
+                        valor += Expresion();
+                        ModificaVariable(variable, valor);
+                        asm.WriteLine("ADD " + variable + ", AX");*/
+                        
+                        return getValorVariable(variable) + valorExpresion ;
+                    }
+                    break;
+                case "-=":  
+                    match("-=");
+                    Expresion();
+                    valorExpresion  = stack.Pop();
+                    if (evaluacion)
+                    {
+                        /*float valor = getValorVariable(variable);
+                        valor -= Expresion();
+                        ModificaVariable(variable, valor);
+                        asm.WriteLine("SUB " + variable + ", AX");*/
+                        return getValorVariable(variable) - valorExpresion ;
+                    }
+                    break;
+                case "*=":
+                    match("*=");
+                    Expresion();
+                    valorExpresion  = stack.Pop();
+                    if (evaluacion)
+                    {
+                        /*float valor = getValorVariable(variable);
+                        valor *= Expresion();
+                        ModificaVariable(variable, valor);
+                        asm.WriteLine("MUL " + variable + ", AX");*/
+                        return getValorVariable(variable) * valorExpresion ;
+                    }
+                    break;
+                case "/=":
+                    match("/=");
+                    Expresion();
+                    valorExpresion  = stack.Pop();
+                    if (evaluacion)
+                    {
+                        /*float valor = getValorVariable(variable);
+                        valor /= Expresion();
+                        ModificaVariable(variable, valor);
+                        asm.WriteLine("DIV " + variable + ", AX");*/
+                        return getValorVariable(variable) / valorExpresion;
+                    }
+                    break;
+                case "%=":
+                    match("%=");
+                    Expresion();
+                    valorExpresion = stack.Pop();
+                    if (evaluacion)
+                    {
+                        /*float valor = getValorVariable(variable);
+                        valor %= Expresion();
+                        ModificaVariable(variable, valor);
+                        asm.WriteLine("MOD " + variable + ", AX");*/
+                        return getValorVariable(variable) % valorExpresion;
+                    }
+                    break;
             }
             return 0;
         }
@@ -719,6 +797,7 @@ namespace Semantica
                 {
                     Console.Write(EliminaComillas(getContenido()));
                 }
+                asm.WriteLine("PRINTN "+ "\"" + EliminaComillas(getContenido())+ "\"");
                 match(Tipos.Cadena);
             }
             else
@@ -729,6 +808,7 @@ namespace Semantica
                 if(evaluacion)
                 {
                     Console.Write(resulatado);
+                    //codigo ensamblador para imprimir una variable
                 }
             }
             match(")");
@@ -751,9 +831,7 @@ namespace Semantica
 
             if(evaluacion)
             {
-                string sValor =""+ Console.ReadLine(); //Capturamos en pantalla
-                //Requerimiento 5.- el redLine debe capturar un nuemero, pero si manda una cadena debemos levantar una excepción
-                //si el sValor es un numero, modifica el valor, sino no y levantamos una excepción de que no es un número :)
+                string sValor =""+ Console.ReadLine();
                 if(float.TryParse(sValor,out float valor))
                 {
                     ModificaVariable(getContenido(),float.Parse(sValor));
@@ -762,6 +840,9 @@ namespace Semantica
                 {
                     throw new Error("\nError de sintaxis, el valor no es un numero <" + getContenido() + "> en linea: " + linea, log);
                 }
+                asm.WriteLine("CALL SACAN_NUM");
+                asm.WriteLine("MOV "+ getContenido() + ",CX");
+                //asm.WriteLine("SCAN_NUM " + getContenido());
                 
             }
 
