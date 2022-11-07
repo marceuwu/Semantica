@@ -127,6 +127,8 @@ namespace Semantica
         public void cerrar()
         {
             archivo.Close();
+            log.WriteLine("Fin de compilacion");
+            Console.WriteLine("\nFin de compilacion");
             log.Close();
             asm.Close();
         }       
