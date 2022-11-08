@@ -8,7 +8,7 @@ float x;
 char y; int i ;int j, k;
 // Este programa calcula el volumen de un cilindro.
 void main(){
-    altura =5;
+    altura =2;
     for(i = altura; i > 0; i-=1){
         j = 0; 
         while(j < altura-i){

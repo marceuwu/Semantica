@@ -634,62 +634,38 @@ namespace Semantica
             switch (getContenido()){
                 case "++":
                     match("++");
-                    if (evaluacion)
-                    {
-                        //Console.WriteLine("INC " + variable);
-                        if (ejecutaASM)
-                            asm.WriteLine("INC "+variable);
-                        return getValorVariable(variable) + 1;
-                    }
+                    //Console.WriteLine("INC " + variable);
+                    if (ejecutaASM)
+                        asm.WriteLine("INC "+variable);
+                    return getValorVariable(variable) + 1;
                     break;
                 case "--":
                     match("--");
-                    if (evaluacion)
-                    {
-                        if (ejecutaASM)
-                            asm.WriteLine("DEC " + variable);
-                        return getValorVariable(variable) - 1;
-                    }
+                    if (ejecutaASM)
+                        asm.WriteLine("DEC " + variable);
+                    return getValorVariable(variable) - 1;
                     break;
                 case "+=":
                     match("+=");
                     Expresion(ejecutaASM);
                     valorExpresion = stack.Pop();
                     if (ejecutaASM)
-                        asm.WriteLine("POP AX");
-                    //valorVar = getValorVariable(variable);
-                    if (evaluacion)
                     {
-                        if (ejecutaASM)
-                        {
-                            /*asm.WriteLine("MOV AX, " + valorVar);
-                            asm.WriteLine("MOV BX, " + valorExpresion);
-                            asm.WriteLine("ADD AX, BX");
-                            asm.WriteLine("MOV "+variable+", AX");*/
-                            asm.WriteLine("ADD " + variable + ", " + valorExpresion);
-                        }
-                        return getValorVariable(variable) + valorExpresion;
+                        asm.WriteLine("POP AX");
+                        asm.WriteLine("ADD " + variable + ", " + valorExpresion);
                     }
+                    return getValorVariable(variable) + valorExpresion;
                     break;
                 case "-=":  
                     match("-=");
                     Expresion(ejecutaASM);
                     valorExpresion  = stack.Pop();
                     if (ejecutaASM)
-                        asm.WriteLine("POP AX");
-                    //valorVar = getValorVariable(variable);
-                    if (evaluacion)
                     {
-                        if (ejecutaASM)
-                        {
-                            /*asm.WriteLine("MOV AX, " + valorVar);
-                            asm.WriteLine("MOV BX, " + valorExpresion);
-                            asm.WriteLine("SUB AX,BX");
-                            asm.WriteLine("MOV "+variable+", AX");*/
-                            asm.WriteLine("SUB " + variable + ", " + valorExpresion);
-                        }
-                        return getValorVariable(variable) - valorExpresion;
+                        asm.WriteLine("POP AX");
+                        asm.WriteLine("SUB " + variable + ", " + valorExpresion);
                     }
+                    return getValorVariable(variable) - valorExpresion;
                     break;
                 case "*=":
                     match("*=");
@@ -698,17 +674,15 @@ namespace Semantica
                     if(ejecutaASM)
                         asm.WriteLine("POP AX");
                     valorVar = getValorVariable(variable);
-                    if (evaluacion)
+
+                    if (ejecutaASM)
                     {
-                        if (ejecutaASM)
-                        {
-                            asm.WriteLine("MOV AX, " + variable);
-                            asm.WriteLine("MOV BX, " + valorExpresion);
-                            asm.WriteLine("MUL BX");
-                            asm.WriteLine("MOV "+variable+", AX");
-                        }
-                        return getValorVariable(variable) * valorExpresion;
+                        asm.WriteLine("MOV AX, " + variable);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("MUL BX");
+                        asm.WriteLine("MOV "+variable+", AX");
                     }
+                    return getValorVariable(variable) * valorExpresion;
                     break;
                 case "/=":
                     match("/=");
@@ -717,17 +691,14 @@ namespace Semantica
                     if (ejecutaASM)
                         asm.WriteLine("POP AX");
                     valorVar = getValorVariable(variable);
-                    if (evaluacion)
+                    if (ejecutaASM)
                     {
-                        if (ejecutaASM)
-                        {
-                            asm.WriteLine("MOV AX, " + variable);
-                            asm.WriteLine("MOV BX, " + valorExpresion);
-                            asm.WriteLine("DIV BX");
-                            asm.WriteLine("MOV "+variable+", AX");
-                        }
-                        return getValorVariable(variable) / valorExpresion;
+                        asm.WriteLine("MOV AX, " + variable);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("DIV BX");
+                        asm.WriteLine("MOV "+variable+", AX");
                     }
+                    return getValorVariable(variable) / valorExpresion;
                     break;
                 case "%=":
                     match("%=");
@@ -736,17 +707,14 @@ namespace Semantica
                     if (ejecutaASM)
                         asm.WriteLine("POP AX");
                     valorVar = getValorVariable(variable);
-                    if (evaluacion)
+                    if (ejecutaASM)
                     {
-                        if (ejecutaASM)
-                        {
-                            asm.WriteLine("MOV AX, " + variable);
-                            asm.WriteLine("MOV CX, " + valorExpresion);
-                            asm.WriteLine("DIV CX");
-                            asm.WriteLine("MOV "+variable+", DX");
-                        }
-                        return getValorVariable(variable) % valorExpresion;
+                        asm.WriteLine("MOV AX, " + variable);
+                        asm.WriteLine("MOV CX, " + valorExpresion);
+                        asm.WriteLine("DIV CX");
+                        asm.WriteLine("MOV "+variable+", DX");
                     }
+                    return getValorVariable(variable) % valorExpresion;
                     break;
             }
             return 0;

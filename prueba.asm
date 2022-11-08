@@ -1,5 +1,5 @@
 ;Archivo: prueba.cpp
-;Fecha: 08/11/2022 09:34:30 a. m.
+;Fecha: 08/11/2022 04:21:19 p. m.
 #make_COM#
 include 'emu8086.inc'
 ORG 100h
@@ -17,10 +17,10 @@ ORG 100h
 	i DW ? 
 	j DW ? 
 	k DW ? 
-MOV AX,5
+MOV AX,2
 PUSH AX
 POP AX
-MOV altura,5
+MOV altura,2
 MOV AX,altura
 PUSH AX
 POP AX
@@ -80,6 +80,7 @@ else1:
 MOV AX,1
 PUSH AX
 POP AX
+ADD j, 1
 JMP InicioWhile1
 FinWhile1:
 PRINTN
