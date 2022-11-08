@@ -429,9 +429,6 @@ namespace Semantica
                     if(evaluacion)
                     {
                         ModificaVariable(nombre, resultado);
-                        if(ejecutaASM)
-                            asm.WriteLine("MOV " + nombre + ","+ resultado);
-                        //aqui se hace la modificacion de la variable en ensamblador
                     }
                 }
                 else
@@ -498,23 +495,50 @@ namespace Semantica
         //Do -> do bloque de instrucciones | intruccion while(Condicion)
         private void Do(bool evaluacion, bool ejecutaASM)
         {
-            match("do");
-            if (getContenido() == "{")
+            if(ejecutaASM)
+                cDo++;
+            string lb_inicioDo = "InicioDoWhile" + cDo;
+            string lb_finDo = "FinDoWhile" + cDo;
+            bool validarDo;
+            int posDo = getContCaracter() - getContenido().Length;
+            int lineaActual = linea;
+            
+            if(ejecutaASM)
+                asm.WriteLine(lb_inicioDo+":");
+            do
             {
-                BloqueInstrucciones(evaluacion, ejecutaASM);
+                match("do");
+                if (getContenido() == "{")
+                {
+                    BloqueInstrucciones(evaluacion, ejecutaASM);
+                }
+                else
+                {
+                    Instruccion(evaluacion, ejecutaASM);
+                } 
+                match("while");
+                match("(");
+                //Requerimmiento 4
+                validarDo = Condicion(lb_finDo,ejecutaASM);
+                if (!evaluacion)
+                {
+                    validarDo = evaluacion;
+                }
+                if(validarDo)
+                {
+                    setContCaracter(posDo);
+                    linea = lineaActual;
+                    CambiarPosArchivo(posDo);
+                    NextToken();
+                } 
+                if (ejecutaASM)
+                {
+                    asm.WriteLine("JMP " + lb_inicioDo);
+                    asm.WriteLine(lb_finDo + ":");
+                }
+                ejecutaASM = false;
             }
-            else
-            {
-                Instruccion(evaluacion, ejecutaASM);
-            } 
-            match("while");
-            match("(");
-            //Requerimmiento 4
-            bool validarDo = Condicion("",ejecutaASM);
-            if (!evaluacion)
-            {
-                validarDo = false;
-            }
+            while(validarDo);
             match(")");
             match(";");
         }
@@ -763,11 +787,11 @@ namespace Semantica
 
             float e2 = stack.Pop();
             if (ejecutaASM)
-                asm.WriteLine("POP AX");
+                asm.WriteLine("POP BX");
             float e1 = stack.Pop();
             if (ejecutaASM)
             {
-                asm.WriteLine("POP BX");
+                asm.WriteLine("POP AX");
                 asm.WriteLine("CMP AX,BX");
             }
             switch (operador)

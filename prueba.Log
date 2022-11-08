@@ -1,14 +1,15 @@
 Archivo: prueba.cpp
-07/11/2022 11:43:15 p. m.
+08/11/2022 12:46:59 a. m.
 
 a = 0  = 0
 
-a 2 
-a = a 2 
-a = a 2 
+a 3 
+a = a 3 
+a = a 3 
+a = a 3 
 a = 
 Variables: 
-a Int 2
+a Int 3
 altura Int 0
 j Int 0
 b Char 0

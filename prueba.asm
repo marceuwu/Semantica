@@ -1,5 +1,5 @@
 ;Archivo: prueba.cpp
-;Fecha: 07/11/2022 11:43:15 p. m.
+;Fecha: 08/11/2022 12:46:59 a. m.
 #make_COM#
 include 'emu8086.inc'
 ORG 100h
@@ -16,15 +16,14 @@ MOV a, AX
 InicioWhile1:
 MOV AX,a
 PUSH AX
-MOV AX,2
+MOV AX,3
 PUSH AX
-POP AX
 POP BX
+POP AX
 CMP AX,BX
 JGE FinWhile1
 PRINT "*"
 INC a
-MOV a,1
 JMP InicioWhile1
 FinWhile1:
 RET
