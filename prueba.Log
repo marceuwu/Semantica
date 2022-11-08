@@ -1,16 +1,6 @@
 Archivo: prueba.cpp
-08/11/2022 12:46:59 a. m.
+08/11/2022 01:28:57 a. m.
+3 4 
+a = 3  = 3
 
-a = 0  = 0
-
-a 3 
-a = a 3 
-a = a 3 
-a = a 3 
-a = 
-Variables: 
-a Int 3
-altura Int 0
-j Int 0
-b Char 0
-Fin de compilacion
+a 

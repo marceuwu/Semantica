@@ -826,11 +826,14 @@ namespace Semantica
         //If -> if(Condicion) bloque de instrucciones (else bloque de instrucciones)?
         private void If(bool evaluacion, bool ejecutaASM)
         {
-            string etiquetaIf = "if" + ++cIf;
+            if(ejecutaASM)
+                cIf++;
+            string lb_If = "if" + cIf;
+            string lb_else = "else" + cIf;
             match("if");
             match("(");
             //Requerimiento 4
-            bool validarIf = Condicion(etiquetaIf,ejecutaASM);
+            bool validarIf = Condicion(lb_If,ejecutaASM);
             bool validarElse = false;
             if(!evaluacion)
             {
@@ -845,6 +848,11 @@ namespace Semantica
             else
             {
                 Instruccion(validarIf, ejecutaASM);
+            }
+            if (ejecutaASM)
+            {
+                asm.WriteLine("JMP " + lb_else);
+                asm.WriteLine(lb_If + ":");
             }
             if (getContenido() == "else")
             {
@@ -863,8 +871,9 @@ namespace Semantica
                     Instruccion(validarElse, ejecutaASM);
                 }
             }
-            cIf++;
-            asm.WriteLine(etiquetaIf +":");
+
+            if(ejecutaASM)
+                asm.WriteLine(lb_else +":");
         }
 
         //Printf -> printf(cadena|expresion);
@@ -886,12 +895,16 @@ namespace Semantica
             {
                 Expresion(ejecutaASM);
                 float resulatado = stack.Pop();
-                if (ejecutaASM)
-                    asm.WriteLine("POP AX");
+                 
                 if(evaluacion)
                 {
                     Console.Write(resulatado);
                     //codigo ensamblador para imprimir una variable
+                    if (ejecutaASM)
+                    {
+                        asm.WriteLine("POP AX");
+                        asm.WriteLine("CALL PRINT_NUM");
+                    }
                 }
             }
             match(")");
@@ -927,6 +940,7 @@ namespace Semantica
                 {
                     asm.WriteLine("CALL SACAN_NUM");
                     asm.WriteLine("MOV "+ getContenido() + ",CX");
+                    asm.WriteLine("PRINT \'\'");
                 }
                 //asm.WriteLine("SCAN_NUM " + getContenido());
             }
@@ -1108,18 +1122,12 @@ namespace Semantica
                 }
                 if(huboCasteo)
                 {
-                    //Requerimiento 2.- Actualizar el dominante en base a la variable.TipoDato
                     dominante = casteo;
                     string nombreVar = getContenido();
                     float valor;
                     float valorCastear = stack.Pop();
                     if (ejecutaASM)
                         asm.WriteLine("POP AX");
-                    //sacar un elemento del satck
-                    //convierto ese valor al equivalente en casteo 
-                    //ej. si el casteo es char y el pop regresa un 256 
-                    //el valor equivalente al casteo es un 0
-                    //uasar metodo Requerimiento 3
                     valor = ConvertirDato(valorCastear,sTipoDato);
                     ModificaVariable(nombreVar,valor);
                     stack.Push(valor);
