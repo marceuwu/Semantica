@@ -45,13 +45,15 @@ namespace Semantica
         Variable.TipoDato dominante;
         int cIf;
         int cFor;
+        int cWhile;
+        int cDo;
         public Lenguaje()
         {
-            cIf = cFor = 0;
+            cDo = cWhile = cIf = cFor = 0;
         }
         public Lenguaje(string nombre) : base(nombre)
         {
-            cIf = cFor = 0;
+            cDo = cWhile = cIf = cFor = 0;
         }
         ~Lenguaje()
         {
@@ -425,11 +427,13 @@ namespace Semantica
         //While -> while(Condicion) bloque de instrucciones | instruccion
         private void While(bool evaluacion)
         {
+            cWhile++;
+            string lb_InicioWhile = "InicioWhile" + cWhile;
+            string lb_FinWhile = "FinWhile" + cWhile;
             match("while");
             match("(");
-            //Requermiento 4
-            bool validarWhile = Condicion("");
-            //encontrar una relacion entre evaluación y condicion para ejecutar el bloque de instrucciones
+            asm.WriteLine(lb_InicioWhile+":");
+            bool validarWhile = Condicion(lb_FinWhile);
             if (!evaluacion)
             {
                 validarWhile = false;
@@ -443,6 +447,8 @@ namespace Semantica
             {
                 Instruccion(validarWhile);
             }
+            asm.WriteLine("JMP "+lb_InicioWhile);
+            asm.WriteLine(lb_FinWhile +":");
         }
 
         //Do -> do bloque de instrucciones | intruccion while(Condicion)
