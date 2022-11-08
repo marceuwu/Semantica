@@ -1,6 +1,12 @@
 Archivo: prueba.cpp
-08/11/2022 01:28:57 a. m.
-3 4 
-a = 3  = 3
+08/11/2022 02:18:01 a. m.
 
-a 
+j = 2  = 2
+
+j 10 2 j 10 2 j 10 2 j 10 2 
+Variables: 
+a Int 0
+altura Int 0
+j Int 0
+b Char 0
+Fin de compilacion

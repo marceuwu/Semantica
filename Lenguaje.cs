@@ -410,8 +410,8 @@ namespace Semantica
                 {
                     throw new Error("Error de semantica, NO podemos asiganar un <" + dominante + "> a un "+getTipoVariable(nombre)+ " en linea: " + linea, log);
                 }
-                if(ejecutaASM)
-                    asm.WriteLine("MOV " + nombre + ", AX");
+                //if(ejecutaASM)
+                  //  asm.WriteLine("MOV " + nombre + ", AX");
                 
             }
             else if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
@@ -557,18 +557,16 @@ namespace Semantica
             float valorInc = 0;
             string variableControl ="";
             int lineaActual;
-            asm.WriteLine(etiquetaInicioFor + ":");
             match("for");
             match("(");
             Asignacion(evaluacion, ejecutaASM);
-                        
-            //Requerimmiento 6:  a) guardar la direccion la posición del archivo de texto
             posArchivo = getContCaracter() - getContenido().Length;
             lineaActual = linea;
+            if(ejecutaASM)
+               asm.WriteLine(etiquetaInicioFor+":");
             do
             {
-                //Requerimmiento 4 verificar que la condición se a verdadera
-                validarFor = Condicion("",ejecutaASM);
+                validarFor = Condicion(etiquetaFinFor,ejecutaASM);
                 if(!evaluacion)
                 {
                     validarFor = false;
@@ -596,14 +594,19 @@ namespace Semantica
                 {
                     setContCaracter(posArchivo);
                     linea = lineaActual;
-                    //c) Regresar a la posición de lectura del archivo
                     CambiarPosArchivo(posArchivo);
-                    //d) Sacar otro token
                     NextToken();   
                 }
                 ModificaVariable(variableControl, valorInc);
+
+                if (ejecutaASM)
+                {
+                    asm.WriteLine("JMP "+etiquetaInicioFor);
+                    asm.WriteLine(etiquetaFinFor +":");
+                }
+                ejecutaASM = false;
             }while(validarFor);
-            asm.WriteLine(etiquetaFinFor + ":");
+            //asm.WriteLine(etiquetaFinFor + ":");
         }
         //Incremento -> Identificador ++ | --
         public float Incremento(bool evaluacion, string variable, bool ejecutaASM)
@@ -636,15 +639,16 @@ namespace Semantica
                     valorExpresion = stack.Pop();
                     if (ejecutaASM)
                         asm.WriteLine("POP AX");
-                    valorVar = getValorVariable(variable);
+                    //valorVar = getValorVariable(variable);
                     if (evaluacion)
                     {
                         if (ejecutaASM)
                         {
-                            asm.WriteLine("MOV AX, " + valorVar);
+                            /*asm.WriteLine("MOV AX, " + valorVar);
                             asm.WriteLine("MOV BX, " + valorExpresion);
                             asm.WriteLine("ADD AX, BX");
-                            asm.WriteLine("MOV "+variable+", AX");
+                            asm.WriteLine("MOV "+variable+", AX");*/
+                            asm.WriteLine("ADD " + variable + ", " + valorExpresion);
                         }
                         return getValorVariable(variable) + valorExpresion;
                     }
@@ -655,15 +659,16 @@ namespace Semantica
                     valorExpresion  = stack.Pop();
                     if (ejecutaASM)
                         asm.WriteLine("POP AX");
-                    valorVar = getValorVariable(variable);
+                    //valorVar = getValorVariable(variable);
                     if (evaluacion)
                     {
                         if (ejecutaASM)
                         {
-                            asm.WriteLine("MOV AX, " + valorVar);
+                            /*asm.WriteLine("MOV AX, " + valorVar);
                             asm.WriteLine("MOV BX, " + valorExpresion);
                             asm.WriteLine("SUB AX,BX");
-                            asm.WriteLine("MOV "+variable+", AX");
+                            asm.WriteLine("MOV "+variable+", AX");*/
+                            asm.WriteLine("SUB " + variable + ", " + valorExpresion);
                         }
                         return getValorVariable(variable) - valorExpresion;
                     }
@@ -679,7 +684,7 @@ namespace Semantica
                     {
                         if (ejecutaASM)
                         {
-                            asm.WriteLine("MOV AX, " + valorVar);
+                            asm.WriteLine("MOV AX, " + variable);
                             asm.WriteLine("MOV BX, " + valorExpresion);
                             asm.WriteLine("MUL BX");
                             asm.WriteLine("MOV "+variable+", AX");
@@ -698,7 +703,7 @@ namespace Semantica
                     {
                         if (ejecutaASM)
                         {
-                            asm.WriteLine("MOV AX, " + valorVar);
+                            asm.WriteLine("MOV AX, " + variable);
                             asm.WriteLine("MOV BX, " + valorExpresion);
                             asm.WriteLine("DIV BX");
                             asm.WriteLine("MOV "+variable+", AX");
@@ -717,7 +722,7 @@ namespace Semantica
                     {
                         if (ejecutaASM)
                         {
-                            asm.WriteLine("MOV AX, " + valorVar);
+                            asm.WriteLine("MOV AX, " + variable);
                             asm.WriteLine("MOV CX, " + valorExpresion);
                             asm.WriteLine("DIV CX");
                             asm.WriteLine("MOV "+variable+", DX");
