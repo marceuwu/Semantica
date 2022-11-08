@@ -376,7 +376,13 @@ namespace Semantica
 
             if(getClasificacion() == Tipos.Asignacion)
             {
+                bool identificador = false;
                 match(Tipos.Asignacion);
+                string var = getContenido();
+                if(Tipos.Identificador == getClasificacion())
+                {
+                    identificador = true;
+                }
                 Expresion(ejecutaASM);
                 match(";");
 
@@ -401,8 +407,19 @@ namespace Semantica
                     if(evaluacion)
                     {
                         ModificaVariable(nombre, resultado);
-                        if(ejecutaASM)
-                            asm.WriteLine("MOV " + nombre + ","+ resultado);
+
+                        if (ejecutaASM)
+                        {
+                            if (identificador)
+                            {
+                                asm.WriteLine("MOV AX, "+ var);
+                                asm.WriteLine("MOV " + nombre + ", AX");
+                            }
+                            else
+                            {
+                                asm.WriteLine("MOV " + nombre + ","+ resultado);
+                            }
+                        }
                         //aqui se hace la modificacion de la variable en ensamblador
                     }
                 }
@@ -411,7 +428,7 @@ namespace Semantica
                     throw new Error("Error de semantica, NO podemos asiganar un <" + dominante + "> a un "+getTipoVariable(nombre)+ " en linea: " + linea, log);
                 }
                 //if(ejecutaASM)
-                  //  asm.WriteLine("MOV " + nombre + ", AX");
+                  //asm.WriteLine("MOV " + nombre + ", AX");
                 
             }
             else if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
@@ -460,6 +477,7 @@ namespace Semantica
             do
             {
                 validarWhile = Condicion(lb_FinWhile,ejecutaASM);
+                
                 if (!evaluacion)
                 {
                     validarWhile = false;
@@ -880,20 +898,47 @@ namespace Semantica
             if(ejecutaASM)
                 asm.WriteLine(lb_else +":");
         }
-
+        public void SaltosDeLinea(string cadena)
+        {
+            if (cadena.Contains("\n"))
+            {
+                string[] subs = cadena.Split("\n");
+                for(int i = 0; i < subs.Length; i++)
+                {
+                   // subs[i] = subs[i].Replace("\n","");
+                   //Console.WriteLine(subs[i]);
+                   if(cadena == "\n")
+                   {
+                       asm.WriteLine("PRINTN");
+                   }
+                   else
+                   {
+                       asm.WriteLine("PRINT "+ "\"" + subs[i] + "\"");
+                       asm.WriteLine("PRINTN");
+                   }
+                   
+                }
+            }
+            else
+            {
+                asm.WriteLine("PRINT "+ "\"" + cadena + "\"");
+            }
+        }
         //Printf -> printf(cadena|expresion);
         private void Printf(bool evaluacion, bool ejecutaASM)
         {
+            string cadena;
             match("printf");
             match("(");
             if(getClasificacion() == Tipos.Cadena)
             {
+                cadena = EliminaComillas(getContenido());
                 if(evaluacion)
                 {
-                    Console.Write(EliminaComillas(getContenido()));
+                    Console.Write(cadena);
                 }
-                if (ejecutaASM)
-                    asm.WriteLine("PRINT "+ "\"" + EliminaComillas(getContenido())+ "\"");
+                if(ejecutaASM)
+                    SaltosDeLinea(cadena);
                 match(Tipos.Cadena);
             }
             else
@@ -943,9 +988,9 @@ namespace Semantica
                 }
                 if (ejecutaASM)
                 {
-                    asm.WriteLine("CALL SACAN_NUM");
+                    asm.WriteLine("CALL SCAN_NUM");
                     asm.WriteLine("MOV "+ getContenido() + ",CX");
-                    asm.WriteLine("PRINT \'\'");
+                    //asm.WriteLine("PRINT \'\'");
                 }
                 //asm.WriteLine("SCAN_NUM " + getContenido());
             }

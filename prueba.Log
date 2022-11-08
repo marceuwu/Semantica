@@ -1,12 +1,58 @@
 Archivo: prueba.cpp
-08/11/2022 02:18:01 a. m.
+08/11/2022 09:34:30 a. m.
 
-j = 2  = 2
+altura = 5  = 5
 
-j 10 2 j 10 2 j 10 2 j 10 2 
+
+i = altura  = 5
+
+i 0 1 
+j = 0  = 0
+
+j altura i - j 2 % 0 
+j = 1 i 0 1 
+j = 0  = 0
+
+j altura i - j 2 % 0 
+j = 1 j altura i - j 2 % 0 
+j = 1 i 0 1 
+j = 0  = 0
+
+j altura i - j 2 % 0 
+j = 1 j altura i - j 2 % 0 
+j = 1 j altura i - j 2 % 0 
+j = 1 i 0 1 
+j = 0  = 0
+
+j altura i - j 2 % 0 
+j = 1 j altura i - j 2 % 0 
+j = 1 j altura i - j 2 % 0 
+j = 1 j altura i - j 2 % 0 
+j = 1 i 0 1 
+j = 0  = 0
+
+j altura i - j 2 % 0 
+j = 1 j altura i - j 2 % 0 
+j = 1 j altura i - j 2 % 0 
+j = 1 j altura i - j 2 % 0 
+j = 1 j altura i - j 2 % 0 
+j = 1 i 0 1 
+j = 0  = 0
+
+j altura i - j 2 % 0 
+j = 1 
 Variables: 
+area Float 0
+radio Float 0
+pi Float 0
+resultado Float 0
 a Int 0
-altura Int 0
-j Int 0
-b Char 0
+d Int 0
+altura Int 5
+cinco Int 0
+x Float 0
+y Char 0
+i Int 0
+j Int 4
+k Int 0
 Fin de compilacion
