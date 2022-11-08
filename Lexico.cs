@@ -128,7 +128,7 @@ namespace Semantica
         {
             archivo.Close();
             log.WriteLine("Fin de compilacion");
-            Console.WriteLine("\n\nFin de compilacion");
+            Console.WriteLine("\n\nFin de compilacion ");
             log.Close();
             asm.Close();
         }       
