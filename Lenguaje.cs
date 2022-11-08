@@ -38,7 +38,7 @@ using System.Text.RegularExpressions;
 namespace Semantica
 {
     
-    public class Lenguaje : Sintaxis
+    public class Lenguaje : Sintaxis, IDisposable
     {
         List<Variable> listaVariables = new List<Variable>();
         Stack<float> stack = new Stack<float>();
@@ -55,9 +55,10 @@ namespace Semantica
         {
             cDo = cWhile = cIf = cFor = 0;
         }
-        ~Lenguaje()
+        public void Dispose()
         {
             Console.WriteLine("Destructor de Lenguaje");
+            //Libera el recurso
             cerrar();
         }
         private float ConvertirDato(float valor, string sTipoDato)
@@ -659,7 +660,7 @@ namespace Semantica
                     if (evaluacion)
                     {
                         asm.WriteLine("DEC " + variable);
-                        Console.WriteLine("DEC " + variable);
+                        //Console.WriteLine("DEC " + variable);
                         ModificaVariable(variable,getValorVariable(variable) - 1);
                     }
                     break;
@@ -667,6 +668,7 @@ namespace Semantica
                     match("+=");
                     Expresion();
                     valorExpresion = stack.Pop();
+                    asm.WriteLine("POP AX");
                     valorVar = getValorVariable(variable);
                     if (evaluacion)
                     {
@@ -681,6 +683,7 @@ namespace Semantica
                     match("-=");
                     Expresion();
                     valorExpresion  = stack.Pop();
+                    asm.WriteLine("POP AX");
                     valorVar = getValorVariable(variable);
                     if (evaluacion)
                     {
@@ -695,12 +698,13 @@ namespace Semantica
                     match("*=");
                     Expresion();
                     valorExpresion  = stack.Pop();
+                    asm.WriteLine("POP AX");
                     valorVar = getValorVariable(variable);
                     if (evaluacion)
                     {
                         asm.WriteLine("MOV AX, " + valorVar);
                         asm.WriteLine("MOV BX, " + valorExpresion);
-                        asm.WriteLine("MUL AX,BX");
+                        asm.WriteLine("MUL BX");
                         asm.WriteLine("MOV "+variable+", AX");
                         ModificaVariable(variable,getValorVariable(variable) * valorExpresion);
                     }
@@ -709,12 +713,13 @@ namespace Semantica
                     match("/=");
                     Expresion();
                     valorExpresion  = stack.Pop();
+                    asm.WriteLine("POP AX");
                     valorVar = getValorVariable(variable);
                     if (evaluacion)
                     {
                         asm.WriteLine("MOV AX, " + valorVar);
                         asm.WriteLine("MOV BX, " + valorExpresion);
-                        asm.WriteLine("DIV AX,BX");
+                        asm.WriteLine("DIV BX");
                         asm.WriteLine("MOV "+variable+", AX");
                         ModificaVariable(variable,getValorVariable(variable) / valorExpresion);
                     }
@@ -723,13 +728,14 @@ namespace Semantica
                     match("%=");
                     Expresion();
                     valorExpresion = stack.Pop();
+                    asm.WriteLine("POP AX");
                     valorVar = getValorVariable(variable);
                     if (evaluacion)
                     {
-                         asm.WriteLine("MOV AX, " + valorVar);
-                        asm.WriteLine("MOV BX, " + valorExpresion);
-                        asm.WriteLine("SUB AX,BX");
-                        asm.WriteLine("MOV "+variable+", AX");
+                        asm.WriteLine("MOV AX, " + valorVar);
+                        asm.WriteLine("MOV CX, " + valorExpresion);
+                        asm.WriteLine("DIV CX");
+                        asm.WriteLine("MOV "+variable+", DX");
                         ModificaVariable(variable,getValorVariable(variable) % valorExpresion);
                     }
                     break;
@@ -874,7 +880,7 @@ namespace Semantica
                 {
                     Console.Write(EliminaComillas(getContenido()));
                 }
-                asm.WriteLine("PRINTN "+ "\"" + EliminaComillas(getContenido())+ "\"");
+                asm.WriteLine("PRINT "+ "\"" + EliminaComillas(getContenido())+ "\"");
                 match(Tipos.Cadena);
             }
             else
@@ -1030,7 +1036,8 @@ namespace Semantica
                     dominante = getTipoVariable(getContenido());
                 }
                 stack.Push(getValorVariable(getContenido()));
-                //requerimiento 3
+                asm.WriteLine("MOV AX,"+getContenido());
+                asm.WriteLine("PUSH AX");
                 match(Tipos.Identificador);
                 
                 //Requerimiento 1. condicion parecida a la de arriba 

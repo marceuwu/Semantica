@@ -1,13 +1,14 @@
 Archivo: prueba.cpp
-07/11/2022 10:00:02 a. m.
+07/11/2022 08:19:18 p. m.
 
-a = 3  = 3
-
-a 2 
-a = 2  = 2
+a = 19  = 19
 
 
+altura = 5  = 5
+
+
+a = altura a 
 Variables: 
-a Int 2
-altura Int 0
+a Int 4
+altura Int 5
 Fin de compilacion

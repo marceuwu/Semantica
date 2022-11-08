@@ -6,13 +6,16 @@
 int a, altura;
 // Este programa calcula el volumen de un cilindro.
 void main(){
+	a = 19;
+	altura = 5;
+	a%=altura;
+	printf(a);
+    /*
 	a = 3;
 	while(a!=2){
 			printf("*");
-			a = 2;
+			a--;
 	}
-    /*
-	a = 3;
 	altura = 4;
 	altura -=a;
 	for(j = 0; j < altura; j+=1){
