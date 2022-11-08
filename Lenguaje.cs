@@ -373,14 +373,13 @@ namespace Semantica
 
             log.WriteLine();
             string nombre = getContenido();
-     
             match(Tipos.Identificador);
             log.Write(nombre + " = ");
+            dominante = Variable.TipoDato.Char;
 
             if(getClasificacion() == Tipos.Asignacion)
             {
                 match(Tipos.Asignacion);
-                dominante = Variable.TipoDato.Char;
                 Expresion();
                 match(";");
 
@@ -404,6 +403,7 @@ namespace Semantica
                     if(evaluacion)
                     {
                         ModificaVariable(nombre, resultado);
+                        asm.WriteLine("MOV " + nombre + ","+ resultado);
                         //aqui se hace la modificacion de la variable en ensamblador
                     }
                 }
@@ -416,7 +416,27 @@ namespace Semantica
             }
             else if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
             {
-                Incremento(evaluacion,nombre);
+                dominante = Variable.TipoDato.Char;
+                float resultado = Incremento(evaluacion,nombre);
+                if(dominante < EvaluaNuemro(resultado))
+                {
+                    dominante = EvaluaNuemro(resultado);
+                    
+                }
+
+                if( dominante <= getTipoVariable(nombre))
+                {
+                    if(evaluacion)
+                    {
+                        ModificaVariable(nombre, resultado);
+                        asm.WriteLine("MOV " + nombre + ","+ resultado);
+                        //aqui se hace la modificacion de la variable en ensamblador
+                    }
+                }
+                else
+                {
+                    throw new Error("Error de semantica, NO podemos asiganar un <" + dominante + "> a un "+getTipoVariable(nombre)+ " en linea: " + linea, log);
+                }
                 match(";");
                 //Requerimiento 1.b
                 //poner los match's
@@ -486,6 +506,7 @@ namespace Semantica
         {
             string variable = getContenido(); //salvamos el token
             float valorExpresion = 0;
+            float valorVar;
             if (ExisteVariable(variable) == false)
             {
                 throw new Error("Error de sintaxis, la variable no ha sido declarada <" + getContenido() + "> en linea: " + linea, log);
@@ -494,16 +515,14 @@ namespace Semantica
             /*b) agregar en Instrucción los incrementos de termino y los increnmentos de factor
                             a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1,
                             donde el 1 puede ser una expresion, valida la expresion y hace el incremneto*/
-            match(Tipos.Identificador);
+            match(Tipos.Identificador);           
             switch (getContenido()){
                 case "++":
                     match("++");
                     if (evaluacion)
                     {
-                        /*float valor = getValorVariable(variable);
-                        valor++;
-                        ModificaVariable(variable, valor);
-                        asm.WriteLine("INC " + variable);*/
+                        Console.WriteLine("INC " + variable);
+                        asm.WriteLine("INC "+variable);
                         return getValorVariable(variable) + 1;
                     }
                     break;
@@ -511,76 +530,85 @@ namespace Semantica
                     match("--");
                     if (evaluacion)
                     {
-                        /*float valor = getValorVariable(variable);
-                        valor--;
-                        ModificaVariable(variable, valor);
-                        asm.WriteLine("DEC " + variable);*/
+                        asm.WriteLine("DEC " + variable);
                         return getValorVariable(variable) - 1;
                     }
                     break;
                 case "+=":
-                    match("+=");
-                    Expresion();
-                    valorExpresion = stack.Pop();
                     if (evaluacion)
                     {
-                        /*float valor = getValorVariable(variable);
-                        valor += Expresion();
-                        ModificaVariable(variable, valor);
-                        asm.WriteLine("ADD " + variable + ", AX");*/
-                        
-                        return getValorVariable(variable) + valorExpresion ;
+                        match("+=");
+                        Expresion();
+                        valorExpresion = stack.Pop();
+                        asm.WriteLine("POP AX");
+                        valorVar = getValorVariable(variable);
+                        if (evaluacion)
+                        {
+                            asm.WriteLine("MOV AX, " + valorVar);
+                            asm.WriteLine("MOV BX, " + valorExpresion);
+                            asm.WriteLine("ADD AX, BX");
+                            asm.WriteLine("MOV "+variable+", AX");
+                            return getValorVariable(variable) + valorExpresion;
+                        }
                     }
                     break;
                 case "-=":  
-                    match("-=");
-                    Expresion();
-                    valorExpresion  = stack.Pop();
                     if (evaluacion)
                     {
-                        /*float valor = getValorVariable(variable);
-                        valor -= Expresion();
-                        ModificaVariable(variable, valor);
-                        asm.WriteLine("SUB " + variable + ", AX");*/
-                        return getValorVariable(variable) - valorExpresion ;
+                        match("+=");
+                        Expresion();
+                        valorExpresion = stack.Pop();
+                        asm.WriteLine("POP AX");
+                        valorVar = getValorVariable(variable);
+                        asm.WriteLine("MOV AX, " + valorVar);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("SUB AX,BX");
+                        asm.WriteLine("MOV "+variable+", AX");
+                        return getValorVariable(variable) - valorExpresion;
                     }
                     break;
                 case "*=":
-                    match("*=");
-                    Expresion();
-                    valorExpresion  = stack.Pop();
                     if (evaluacion)
                     {
-                        /*float valor = getValorVariable(variable);
-                        valor *= Expresion();
-                        ModificaVariable(variable, valor);
-                        asm.WriteLine("MUL " + variable + ", AX");*/
-                        return getValorVariable(variable) * valorExpresion ;
+                        match("+=");
+                        Expresion();
+                        valorExpresion = stack.Pop();
+                        asm.WriteLine("POP AX");
+                        valorVar = getValorVariable(variable);
+                        asm.WriteLine("MOV AX, " + valorVar);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("MUL BX");
+                        asm.WriteLine("MOV "+variable+", AX");
+                        return getValorVariable(variable) * valorExpresion;
                     }
                     break;
                 case "/=":
-                    match("/=");
-                    Expresion();
-                    valorExpresion  = stack.Pop();
                     if (evaluacion)
                     {
-                        /*float valor = getValorVariable(variable);
-                        valor /= Expresion();
-                        ModificaVariable(variable, valor);
-                        asm.WriteLine("DIV " + variable + ", AX");*/
+                        match("+=");
+                        Expresion();
+                        valorExpresion = stack.Pop();
+                        asm.WriteLine("POP AX");
+                        valorVar = getValorVariable(variable);
+                        asm.WriteLine("MOV AX, " + valorVar);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("DIV BX");
+                        asm.WriteLine("MOV "+variable+", AX");
                         return getValorVariable(variable) / valorExpresion;
                     }
                     break;
                 case "%=":
-                    match("%=");
-                    Expresion();
-                    valorExpresion = stack.Pop();
                     if (evaluacion)
                     {
-                        /*float valor = getValorVariable(variable);
-                        valor %= Expresion();
-                        ModificaVariable(variable, valor);
-                        asm.WriteLine("MOD " + variable + ", AX");*/
+                        match("+=");
+                        Expresion();
+                        valorExpresion = stack.Pop();
+                        asm.WriteLine("POP AX");
+                        valorVar = getValorVariable(variable);
+                        asm.WriteLine("MOV AX, " + valorVar);
+                        asm.WriteLine("MOV CX, " + valorExpresion);
+                        asm.WriteLine("DIV CX");
+                        asm.WriteLine("MOV "+variable+", DX");
                         return getValorVariable(variable) % valorExpresion;
                     }
                     break;
@@ -615,7 +643,13 @@ namespace Semantica
                 }
                 match(";");
                 variableControl = getContenido();
-                valorInc = IncrementoFor(validarFor);
+                if (ExisteVariable(variableControl) == false)
+                {
+                    throw new Error("Error de sintaxis, la variable no ha sido declarada <" + getContenido() + "> en linea: " + linea, log);
+                }
+                match(Tipos.Identificador);
+                valorInc = Incremento(validarFor,variableControl);
+
                 //Requerimmiento 1.d
                 match(")");
                 if (getContenido() == "{")
@@ -639,9 +673,109 @@ namespace Semantica
             }while(validarFor);
             asm.WriteLine(etiquetaFinFor + ":");
         }
-
         //Incremento -> Identificador ++ | --
-        private void Incremento(bool evaluacion, string variable)
+        public float Incremento(bool evaluacion, string variable)
+        {
+            float valorExpresion;
+            float valorVar;  
+            switch (getContenido()){
+                case "++":
+                    match("++");
+                    if (evaluacion)
+                    {
+                        //Console.WriteLine("INC " + variable);
+                        asm.WriteLine("INC "+variable);
+                        return getValorVariable(variable) + 1;
+                    }
+                    break;
+                case "--":
+                    match("--");
+                    if (evaluacion)
+                    {
+                        asm.WriteLine("DEC " + variable);
+                        return getValorVariable(variable) - 1;
+                    }
+                    break;
+                case "+=":
+                    match("+=");
+                    Expresion();
+                    valorExpresion = stack.Pop();
+                    asm.WriteLine("POP AX");
+                    valorVar = getValorVariable(variable);
+                    if (evaluacion)
+                    {
+                        asm.WriteLine("MOV AX, " + valorVar);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("ADD AX, BX");
+                        asm.WriteLine("MOV "+variable+", AX");
+                        return getValorVariable(variable) + valorExpresion;
+                    }
+                    break;
+                case "-=":  
+                    match("-=");
+                    Expresion();
+                    valorExpresion  = stack.Pop();
+                    asm.WriteLine("POP AX");
+                    valorVar = getValorVariable(variable);
+                    if (evaluacion)
+                    {
+                        asm.WriteLine("MOV AX, " + valorVar);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("SUB AX,BX");
+                        asm.WriteLine("MOV "+variable+", AX");
+                        return getValorVariable(variable) - valorExpresion;
+                    }
+                    break;
+                case "*=":
+                    match("*=");
+                    Expresion();
+                    valorExpresion  = stack.Pop();
+                    asm.WriteLine("POP AX");
+                    valorVar = getValorVariable(variable);
+                    if (evaluacion)
+                    {
+                        asm.WriteLine("MOV AX, " + valorVar);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("MUL BX");
+                        asm.WriteLine("MOV "+variable+", AX");
+                        return getValorVariable(variable) * valorExpresion;
+                    }
+                    break;
+                case "/=":
+                    match("/=");
+                    Expresion();
+                    valorExpresion  = stack.Pop();
+                    asm.WriteLine("POP AX");
+                    valorVar = getValorVariable(variable);
+                    if (evaluacion)
+                    {
+                        asm.WriteLine("MOV AX, " + valorVar);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("DIV BX");
+                        asm.WriteLine("MOV "+variable+", AX");
+                        return getValorVariable(variable) / valorExpresion;
+                    }
+                    break;
+                case "%=":
+                    match("%=");
+                    Expresion();
+                    valorExpresion = stack.Pop();
+                    asm.WriteLine("POP AX");
+                    valorVar = getValorVariable(variable);
+                    if (evaluacion)
+                    {
+                        asm.WriteLine("MOV AX, " + valorVar);
+                        asm.WriteLine("MOV CX, " + valorExpresion);
+                        asm.WriteLine("DIV CX");
+                        asm.WriteLine("MOV "+variable+", DX");
+                        return getValorVariable(variable) % valorExpresion;
+                    }
+                    break;
+            }
+            return 0;
+        }
+        //Incremento -> Identificador ++ | --
+        /*private void Incremento(bool evaluacion, string variable)
         {
             float valorExpresion;
             float valorVar;
@@ -740,7 +874,7 @@ namespace Semantica
                     }
                     break;
             }
-        }
+        }*/
 
         //Switch -> switch (Expresion) {Lista de casos} | (default: )
         private void Switch(bool evaluacion)
@@ -1068,10 +1202,18 @@ namespace Semantica
 
                     match(Tipos.TipoDato);
                     match(")");
-                    match("(");
+                    
                 }
-                Expresion();
-                match(")");
+                if(getContenido() == "(")
+                {
+                    match("(");
+                    Expresion();
+                    match(")");
+                }
+                else
+                {
+                    Expresion();
+                }
                 if(huboCasteo)
                 {
                     //Requerimiento 2.- Actualizar el dominante en base a la variable.TipoDato
@@ -1088,6 +1230,8 @@ namespace Semantica
                     valor = ConvertirDato(valorCastear,sTipoDato);
                     ModificaVariable(nombreVar,valor);
                     stack.Push(valor);
+                    asm.WriteLine("MOV AX,"+valor);
+                    asm.WriteLine("PUSH AX");
                 }
             }
         }
