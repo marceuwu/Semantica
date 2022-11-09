@@ -8,19 +8,18 @@ namespace Semantica
     {
         static void Main(string[] args)
         {
-            try
+            using (Lenguaje a = new Lenguaje())
             {
-
-                Lenguaje a = new Lenguaje();
-
-                a.Programa();
-                a.cerrar();
-
+                try
+                {
+                    a.Programa();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            
 
             Console.ReadLine();
         }

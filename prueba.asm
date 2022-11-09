@@ -1,5 +1,5 @@
 ;Archivo: prueba.cpp
-;Fecha: 08/11/2022 06:42:35 p. m.
+;Fecha: 08/11/2022 09:37:57 p. m.
 #make_COM#
 include 'emu8086.inc'
 ORG 100h
@@ -17,85 +17,28 @@ ORG 100h
 	i DW ? 
 	j DW ? 
 	k DW ? 
-MOV AX,2
+PRINT "Valor de variable int a antes del casteo: "
+MOV AX,a
 PUSH AX
 POP AX
-MOV altura, AX
-MOV AX,altura
+CALL PRINT_NUM
+MOV AX,a
 PUSH AX
 POP AX
-MOV i, AX
-inicioFor0:
-MOV AX,i
-PUSH AX
-MOV AX,0
-PUSH AX
-POP BX
-POP AX
-CMP AX,BX
-JLE finFor0
-MOV AX,1
-PUSH AX
-POP AX
-MOV AX, i
-MOV BX, 1
-SUB AX,BX
-PUSH AX
 MOV AX,0
 PUSH AX
 POP AX
-MOV j, AX
-InicioWhile1:
-MOV AX,j
-PUSH AX
-MOV AX,altura
-PUSH AX
-MOV AX,i
-PUSH AX
-POP BX
-POP AX
-SUB AX,BX
-PUSH AX
-POP BX
-POP AX
-CMP AX,BX
-JGE FinWhile1
-MOV AX,j
-PUSH AX
-MOV AX,2
-PUSH AX
-POP BX
-POP AX
-DIV BX
-PUSH DX
-MOV AX,0
-PUSH AX
-POP BX
-POP AX
-CMP AX,BX
-JNE if1
-PRINT "*"
-JMP else1
-if1:
-PRINT "-"
-else1:
-MOV AX,1
-PUSH AX
-POP AX
-MOV AX, j
-MOV BX, 1
-ADD AX, BX
-PUSH AX
-POP AX
-MOV j, AX
-JMP InicioWhile1
-FinWhile1:
+MOV y, AX
 PRINTN
-PRINTN
+PRINT "Valor de variable char y despues del casteo de a: "
+MOV AX,y
+PUSH AX
 POP AX
-MOV i, AX
-JMP inicioFor0
-finFor0:
+CALL PRINT_NUM
+PRINTN
+PRINT "A continuacion se intenta asignar un int a un char sin usar casteo: "
+PRINTN
+PRINT ""
 RET
 DEFINE_SCAN_NUM
 DEFINE_PRINT_NUM

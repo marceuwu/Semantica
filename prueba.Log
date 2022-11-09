@@ -1,25 +1,9 @@
 Archivo: prueba.cpp
-08/11/2022 06:42:35 p. m.
+08/11/2022 09:37:57 p. m.
+a 
+y = a  = 0
 
-altura = 2  = 2
-
-
-i = altura  = 2
-
-i 0 1 
-j = 0  = 0
-
-j altura i - j 2 % 0 
-j = 1 i 0 1 
-j = 0  = 0
-
-j altura i - j 2 % 0 
-j = 1 j altura i - j 2 % 0 
-j = 1 i 0 1 
-j = 0  = 0
-
-j altura i - j 2 % 0 
-j = 1 
+y 
 Variables: 
 area Float 0
 radio Float 0
@@ -27,11 +11,11 @@ pi Float 0
 resultado Float 0
 a Int 0
 d Int 0
-altura Int 2
+altura Int 0
 cinco Int 0
 x Float 0
 y Char 0
-i Int -1
-j Int 1
+i Int 0
+j Int 0
 k Int 0
 Fin de compilacion

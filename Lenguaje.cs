@@ -904,28 +904,35 @@ namespace Semantica
         }
         public void SaltosDeLinea(string cadena)
         {
-            if (cadena.Contains("\n"))
+            int nPosF;
+            int nPosI = cadena.IndexOf('\n');
+            string auxCadena;
+            if(nPosI<0)
             {
-                string[] subs = cadena.Split("\n");
-                for(int i = 0; i < subs.Length; i++)
-                {
-                   // subs[i] = subs[i].Replace("\n","");
-                   //Console.WriteLine(subs[i]);
-                   if(cadena == "\n")
-                   {
-                       asm.WriteLine("PRINTN");
-                   }
-                   else
-                   {
-                       asm.WriteLine("PRINT "+ "\"" + subs[i] + "\"");
-                       asm.WriteLine("PRINTN");
-                   }
-                   
-                }
+                asm.WriteLine("PRINT "+ "\"" + cadena + "\"");
             }
             else
             {
-                asm.WriteLine("PRINT "+ "\"" + cadena + "\"");
+
+                while (nPosI >= 0)
+                {
+                    nPosI++;
+                    asm.WriteLine("PRINTN");
+                    nPosF = cadena.IndexOf('\n',nPosI);
+                    if (nPosF >= 0)
+                    {
+                        
+                        auxCadena = cadena.Substring(nPosI, nPosF-nPosI);
+                        asm.WriteLine("PRINT "+ "\"" + auxCadena + "\"");
+                    }
+                    else
+                    {
+                         auxCadena = cadena.Substring(nPosI);
+                         asm.WriteLine("PRINT "+ "\"" + auxCadena + "\"");
+                    }
+                    nPosI = nPosF;
+
+                }
             }
         }
         //Printf -> printf(cadena|expresion);
