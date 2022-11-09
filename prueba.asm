@@ -1,5 +1,5 @@
 ;Archivo: prueba.cpp
-;Fecha: 08/11/2022 06:33:41 p. m.
+;Fecha: 08/11/2022 06:42:35 p. m.
 #make_COM#
 include 'emu8086.inc'
 ORG 100h
