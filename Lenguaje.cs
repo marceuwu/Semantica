@@ -410,15 +410,16 @@ namespace Semantica
 
                         if (ejecutaASM)
                         {
-                            if (identificador)
+                            asm.WriteLine("MOV " + nombre + ", AX");
+                            /*if (identificador)
                             {
-                                asm.WriteLine("MOV AX, "+ var);
+                                //asm.WriteLine("MOV AX, "+ var);
                                 asm.WriteLine("MOV " + nombre + ", AX");
                             }
                             else
                             {
-                                asm.WriteLine("MOV " + nombre + ","+ resultado);
-                            }
+                                asm.WriteLine("MOV " + nombre + ", AX");
+                            }*/
                         }
                         //aqui se hace la modificacion de la variable en ensamblador
                     }
@@ -434,7 +435,12 @@ namespace Semantica
             else if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
             {
                 dominante = Variable.TipoDato.Char;
-                float resultado = Incremento(evaluacion,nombre,ejecutaASM);
+                //float resultado = Incremento(evaluacion,nombre,ejecutaASM);
+                Incremento(evaluacion,nombre,ejecutaASM);
+                float resultado = stack.Pop();
+                if(ejecutaASM)
+                    asm.WriteLine("POP AX");
+
                 if(dominante < EvaluaNuemro(resultado))
                 {
                     dominante = EvaluaNuemro(resultado);
@@ -446,6 +452,10 @@ namespace Semantica
                     if(evaluacion)
                     {
                         ModificaVariable(nombre, resultado);
+                    }
+                    if (ejecutaASM)
+                    {
+                         asm.WriteLine("MOV " + nombre + ", AX");
                     }
                 }
                 else
@@ -596,8 +606,8 @@ namespace Semantica
                     throw new Error("Error de sintaxis, la variable no ha sido declarada <" + getContenido() + "> en linea: " + linea, log);
                 }
                 match(Tipos.Identificador);
-                valorInc = Incremento(validarFor,variableControl, ejecutaASM);
-
+                //valorInc = Incremento(validarFor,variableControl, ejecutaASM);
+                Incremento(validarFor,variableControl, ejecutaASM);
                 //Requerimmiento 1.d
                 match(")");
                 if (getContenido() == "{")
@@ -615,8 +625,13 @@ namespace Semantica
                     CambiarPosArchivo(posArchivo);
                     NextToken();   
                 }
+                valorInc = stack.Pop();
                 ModificaVariable(variableControl, valorInc);
-
+                if (ejecutaASM)
+                {
+                    asm.WriteLine("POP AX");
+                    asm.WriteLine("MOV " + variableControl + ", AX");
+                }  
                 if (ejecutaASM)
                 {
                     asm.WriteLine("JMP "+etiquetaInicioFor);
@@ -650,11 +665,20 @@ namespace Semantica
                     Expresion(ejecutaASM);
                     valorExpresion = stack.Pop();
                     if (ejecutaASM)
-                    {
                         asm.WriteLine("POP AX");
-                        asm.WriteLine("ADD " + variable + ", " + valorExpresion);
+                    valorVar = getValorVariable(variable);
+                    if (ejecutaASM)
+                    {
+                        asm.WriteLine("MOV AX, " + variable);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("ADD AX, BX");
+                        asm.WriteLine("PUSH AX");
+                        
+                        //asm.WriteLine("POP AX");
+                        //asm.WriteLine("ADD " + variable + ", " + valorExpresion);
                     }
-                    return getValorVariable(variable) + valorExpresion;
+                    stack.Push(getValorVariable(variable) + valorExpresion);
+                    //return getValorVariable(variable) + valorExpresion;
                     break;
                 case "-=":  
                     match("-=");
@@ -662,10 +686,18 @@ namespace Semantica
                     valorExpresion  = stack.Pop();
                     if (ejecutaASM)
                     {
-                        asm.WriteLine("POP AX");
-                        asm.WriteLine("SUB " + variable + ", " + valorExpresion);
+                        asm.WriteLine("POP AX");  
                     }
-                    return getValorVariable(variable) - valorExpresion;
+                    valorVar = getValorVariable(variable);
+                    if (ejecutaASM)
+                    {
+                        asm.WriteLine("MOV AX, " + variable);
+                        asm.WriteLine("MOV BX, " + valorExpresion);
+                        asm.WriteLine("SUB AX,BX");
+                        asm.WriteLine("PUSH AX");
+                    }
+                    stack.Push(getValorVariable(variable) - valorExpresion);
+                    //return getValorVariable(variable) - valorExpresion;
                     break;
                 case "*=":
                     match("*=");

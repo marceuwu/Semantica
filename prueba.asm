@@ -1,5 +1,5 @@
 ;Archivo: prueba.cpp
-;Fecha: 08/11/2022 04:21:19 p. m.
+;Fecha: 08/11/2022 06:33:41 p. m.
 #make_COM#
 include 'emu8086.inc'
 ORG 100h
@@ -20,11 +20,10 @@ ORG 100h
 MOV AX,2
 PUSH AX
 POP AX
-MOV altura,2
+MOV altura, AX
 MOV AX,altura
 PUSH AX
 POP AX
-MOV AX, altura
 MOV i, AX
 inicioFor0:
 MOV AX,i
@@ -38,11 +37,14 @@ JLE finFor0
 MOV AX,1
 PUSH AX
 POP AX
-SUB i, 1
+MOV AX, i
+MOV BX, 1
+SUB AX,BX
+PUSH AX
 MOV AX,0
 PUSH AX
 POP AX
-MOV j,0
+MOV j, AX
 InicioWhile1:
 MOV AX,j
 PUSH AX
@@ -80,11 +82,18 @@ else1:
 MOV AX,1
 PUSH AX
 POP AX
-ADD j, 1
+MOV AX, j
+MOV BX, 1
+ADD AX, BX
+PUSH AX
+POP AX
+MOV j, AX
 JMP InicioWhile1
 FinWhile1:
 PRINTN
 PRINTN
+POP AX
+MOV i, AX
 JMP inicioFor0
 finFor0:
 RET
