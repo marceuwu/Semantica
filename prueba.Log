@@ -1,7 +1,21 @@
 Archivo: prueba.cpp
-08/11/2022 09:37:57 p. m.
+10/11/2022 09:53:50 p. m.
+altura 2 
+i = altura  = 1
+
+i 0 1 
+j = 0  = 0
+
+j altura i - j 2 % 0 
+j = 1 
+k = 0  = 0
+
+
+k = 2 k altura 2 * 1 1 2 2 
+a = 260  = 260
+
 a 
-y = a  = 0
+y = a  = 4
 
 y 
 Variables: 
@@ -9,13 +23,13 @@ area Float 0
 radio Float 0
 pi Float 0
 resultado Float 0
-a Int 0
+a Int 260
 d Int 0
-altura Int 0
+altura Int 1
 cinco Int 0
 x Float 0
-y Char 0
-i Int 0
+y Char 4
+i Int -1
 j Int 0
 k Int 0
 Fin de compilacion

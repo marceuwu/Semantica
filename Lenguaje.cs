@@ -376,13 +376,9 @@ namespace Semantica
 
             if(getClasificacion() == Tipos.Asignacion)
             {
-                bool identificador = false;
                 match(Tipos.Asignacion);
                 string var = getContenido();
-                if(Tipos.Identificador == getClasificacion())
-                {
-                    identificador = true;
-                }
+
                 Expresion(ejecutaASM);
                 match(";");
 
@@ -392,9 +388,6 @@ namespace Semantica
 
                 log.WriteLine(" = " + resultado);
                 log.WriteLine();
-
-                //Console.WriteLine(dominante);
-                //Console.WriteLine(EvaluaNuemro(resultado));
 
                 if(dominante < EvaluaNuemro(resultado))
                 {
@@ -407,21 +400,10 @@ namespace Semantica
                     if(evaluacion)
                     {
                         ModificaVariable(nombre, resultado);
-
-                        if (ejecutaASM)
-                        {
-                            asm.WriteLine("MOV " + nombre + ", AX");
-                            /*if (identificador)
-                            {
-                                //asm.WriteLine("MOV AX, "+ var);
-                                asm.WriteLine("MOV " + nombre + ", AX");
-                            }
-                            else
-                            {
-                                asm.WriteLine("MOV " + nombre + ", AX");
-                            }*/
-                        }
-                        //aqui se hace la modificacion de la variable en ensamblador
+                    }
+                    if (ejecutaASM)
+                    {
+                        asm.WriteLine("MOV " + nombre + ", AX");
                     }
                 }
                 else
